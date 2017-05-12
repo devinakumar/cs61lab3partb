@@ -1,0 +1,50 @@
+"""
+  dbexample.java
+  Ira Ray Jenkins
+
+  This simple example demonstrates connecting to a MySQL database and 
+  executing a sample query.
+"""
+from __future__ import print_function        # make print a function
+import mysql.connector                       # mysql functionality
+import sys                                   # for misc errors
+
+SERVER   = "sunapee.cs.dartmouth.edu"        # db server to connect to
+USERNAME = "hwilson"                            # user to connect as
+PASSWORD = "Password1"                            # user's password
+DATABASE = "hwilson2_db"                              # db to user
+
+def login(input):
+  try:
+    id = int(input[1])
+    print ("Logging in %d" % id)
+  except (ValueError,IndexError):
+    print ("User does not exist")
+
+if __name__ == "__main__":
+   try:
+      # initialize db connection
+      con = mysql.connector.connect(host=SERVER,user=USERNAME,password=PASSWORD,
+                                    database=DATABASE)
+
+      print("Connection established.")
+
+      running = True
+
+      while running:
+        input = raw_input('> ').split()
+
+        if input[0] == 'login':
+          login(input)
+        else:
+          print("Ok")
+
+   except mysql.connector.Error as e:        # catch SQL errors
+      print("SQL Error: {0}".format(e.msg))
+   except:                                   # anything else
+      print("Unexpected error: {0}".format(sys.exc_info()[0]))
+   
+   # cleanup
+   con.close()
+   
+   print("\nConnection terminated.", end='')
