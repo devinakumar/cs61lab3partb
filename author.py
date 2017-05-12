@@ -1,12 +1,8 @@
-<<<<<<< HEAD
 from __future__ import print_function        # make print a function
 import mysql.connector                       # mysql functionality
 import sys                                   # for misc errors
 
-class Author:
-=======
 class PrimaryAuthor:
->>>>>>> 2468a726b1cba94860d01d0e78dbdb4fb96863aa
     def __init__(self, id, connection):
         self.id = id
         self.con = connection
@@ -17,7 +13,7 @@ class PrimaryAuthor:
     def status(self):
 
         print "Welcome back!"
-        
+
         query = "SELECT FirstName, LastName, MailingAddress FROM PrimaryAuthor WHERE PrimaryAuthorId = %d;" % self.id
 
         # initialize a cursor and query db
