@@ -7,7 +7,7 @@ class Editor:
         return
 
     def status():
-        return
+    	print("Status of editor")
 
     def assign(manuscriptId, reviewerId):
         return

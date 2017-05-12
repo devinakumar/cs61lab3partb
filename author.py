@@ -7,6 +7,7 @@ class Author:
         return
 
     def status():
+        print("Status of author")
         return
 
     def submit(title, affiliation, ri, secondaryAuths, filename):

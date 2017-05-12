@@ -47,6 +47,7 @@ def login(input):
         user = Author(userId, con)
 
       print("Welcome, %d" % user.id)
+      user.status()
 
     cursor.close()
   except (ValueError,IndexError):

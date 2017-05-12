@@ -11,6 +11,7 @@ class Reviewer:
         return
 
     def status():
+        print("Status of reviewer")
         return
 
     def review(manuscriptId, appropriateness, clarity, methodology, fieldContribution, recommendation):
