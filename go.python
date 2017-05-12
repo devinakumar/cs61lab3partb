@@ -8,36 +8,63 @@
 from __future__ import print_function        # make print a function
 import mysql.connector                       # mysql functionality
 import sys                                   # for misc errors
+import shlex                                 # for parsing
 
 SERVER   = "sunapee.cs.dartmouth.edu"        # db server to connect to
 USERNAME = "hwilson"                            # user to connect as
 PASSWORD = "Password1"                            # user's password
 DATABASE = "hwilson2_db"                              # db to user
 
+UserId = 0
+UserType = ""
+
 def login(input):
   try:
-    id = int(input[1])
-    print ("Logging in %d" % id)
+    UserType = input[1].capitalize()
+    UserId = int(input[2])
+
+    if UserType not in ['Editor','Reviewer','Author']:
+      return
+
+    QUERY = "SELECT * FROM %s WHERE %sId = %d" % (UserType,UserType,UserId)
+
+    # initialize a cursor
+    cursor = con.cursor()
+
+    # query db
+    cursor.execute(QUERY)
+    
+    print("Query executed: '{0}'\n\nResults:".format(QUERY))
+
+    # print table header
+    print("".join(["{:<12}".format(col) for col in cursor.column_names]))
+    print("--------------------------------------------")
+
+    # iterate through results
+    for row in cursor:
+       print("".join(["{:<12}".format(col) for col in row]))
+
+    cursor.close()
   except (ValueError,IndexError):
     print ("User does not exist")
 
 if __name__ == "__main__":
    try:
       # initialize db connection
-      con = mysql.connector.connect(host=SERVER,user=USERNAME,password=PASSWORD,
-                                    database=DATABASE)
-
-      print("Connection established.")
+      con = mysql.connector.connect(host=SERVER,user=USERNAME,password=PASSWORD,database=DATABASE)
 
       running = True
 
       while running:
-        input = raw_input('> ').split()
+        try:
+          input = shlex.split(raw_input('> '))
 
-        if input[0] == 'login':
-          login(input)
-        else:
-          print("Ok")
+          if input[0] == 'login':
+            login(input)
+          else:
+            print("Ok")
+        except ValueError:
+          print("Invalid input")
 
    except mysql.connector.Error as e:        # catch SQL errors
       print("SQL Error: {0}".format(e.msg))
