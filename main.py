@@ -9,8 +9,8 @@ from __future__ import print_function        # make print a function
 import mysql.connector                       # mysql functionality
 import sys                                   # for misc errors
 import shlex                                 # for parsing
-from editor import Editor 
-from reviewer import Reviewer 
+from editor import Editor
+from reviewer import Reviewer
 from author import Author
 
 
@@ -47,6 +47,7 @@ def login(input):
         user = Author(userId, con)
 
       print("Welcome, %d" % user.id)
+      user.status()
 
     cursor.close()
   except (ValueError,IndexError):

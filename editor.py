@@ -3,26 +3,26 @@ class Editor:
         self.id = id
         self.con = connection
 
-    def register(fname, lname):
+    def register(self, fname, lname):
         return
 
-    def status():
+    def status(self):
+        print "got here"
+
+    def assign(self, manuscriptId, reviewerId):
         return
 
-    def assign(manuscriptId, reviewerId):
+    def reject(self, manuscriptId):
         return
 
-    def reject(manuscriptId):
+    def accept(self, manuscriptId):
         return
 
-    def accept(manuscriptId):
+    def typeset(self, manuscriptId, pp):
         return
 
-    def typeset(manuscriptId, pp):
+    def schedule(self, manuscriptId, issue):
         return
 
-    def schedule(manuscriptId, issue):
-        return
-
-    def publish(issue):
+    def publish(self, issue):
         return

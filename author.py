@@ -3,14 +3,14 @@ class Author:
         self.id = id
         self.con = connection
 
-    def register(fname, lname, email, address):
+    def register(self, fname, lname, email, address):
         return
 
-    def status():
+    def status(self):
         return
 
-    def submit(title, affiliation, ri, secondaryAuths, filename):
+    def submit(self, title, affiliation, ri, secondaryAuths, filename):
         return
 
-    def retract(manuscriptId):
+    def retract(self, manuscriptId):
         return

@@ -3,16 +3,15 @@ class Reviewer:
         self.id = id
         self.con = connection
 
-    def register(fname, lname, RICodes):
+    def register(self, fname, lname, RICodes):
         return
 
-    def resign():
+    def resign(self):
         print "Thank you for your service."
         return
 
-    def status():
+    def status(self):
         return
 
-    def review(manuscriptId, appropriateness, clarity, methodology, fieldContribution, recommendation):
+    def review(self, manuscriptId, appropriateness, clarity, methodology, fieldContribution, recommendation):
         return
-    
