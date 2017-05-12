@@ -11,7 +11,7 @@ import sys                                   # for misc errors
 import shlex                                 # for parsing
 from editor import Editor
 from reviewer import Reviewer
-from author import Author
+from author import PrimaryAuthor
 
 
 SERVER   = "sunapee.cs.dartmouth.edu"        # db server to connect to
@@ -26,29 +26,25 @@ def login(input):
     userType = input[1].capitalize()
     userId = int(input[2])
 
-    if userType not in ['Editor','Reviewer','Author']:
-      return
+    if userType == "Author":
+      userType = "PrimaryAuthor"
 
-    QUERY = "SELECT COUNT(*) FROM %s WHERE %sId = %d" % (userType,userType,userId)
+    query = "SELECT COUNT(*) FROM %s WHERE %sId = %d" % (userType,userType,userId)
 
     # initialize a cursor
     cursor = con.cursor()
 
     # query db
-    cursor.execute(QUERY)
+    cursor.execute(query)
     result = cursor.fetchone()
 
     if result[0] == 1:
       if userType == "Editor":
-        user = Editor(userId, con)
+        return Editor(userId, con)
       elif userType == "Reviewer":
-        user = Reviewer(userId, con)
-      elif userType == "Author":
-        user = Author(userId, con)
-
-      print("Welcome, %d" % user.id)
-      user.status()
-
+        return Reviewer(userId, con)
+      elif userType == "PrimaryAuthor":
+        return PrimaryAuthor(userId, con)
     cursor.close()
   except (ValueError,IndexError):
     print ("User does not exist")
@@ -59,13 +55,16 @@ if __name__ == "__main__":
       con = mysql.connector.connect(host=SERVER,user=USERNAME,password=PASSWORD,database=DATABASE)
 
       running = True
-
       while running:
         try:
           input = shlex.split(raw_input('> '))
+          command = input[0]
 
-          if input[0] == 'login':
+          if command == 'login':
             user = login(input)
+            user.status()
+          elif command == 'status':
+            user.status()
           else:
             print("Ok")
         except ValueError:
