@@ -1,4 +1,18 @@
 class Reviewer:
-  def __init__(self, id, connection):
-    self.id = id
-    self.con = connection
+    def __init__(self, id, connection):
+        self.id = id
+        self.con = connection
+
+    def register(fname, lname, RICodes):
+        return
+
+    def resign():
+        print "Thank you for your service."
+        return
+
+    def status():
+        return
+
+    def review(manuscriptId, appropriateness, clarity, methodology, fieldContribution, recommendation):
+        return
+    
