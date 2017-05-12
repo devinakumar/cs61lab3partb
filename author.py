@@ -1,4 +1,4 @@
-class Author:
+class PrimaryAuthor:
     def __init__(self, id, connection):
         self.id = id
         self.con = connection
@@ -7,7 +7,32 @@ class Author:
         return
 
     def status(self):
-        return
+
+        print "Welcome back!"
+        
+        query = "SELECT FirstName, LastName, MailingAddress FROM PrimaryAuthor WHERE PrimaryAuthorId = %d;" % self.id
+
+        # initialize a cursor and query db
+        cursor = self.con.cursor()
+        cursor.execute(query)
+
+        for row in cursor:
+            print("".join(["{:<12}".format(col) for col in row]))
+
+        cursor.close()
+
+        query = "SELECT COUNT(*) as `Number`, Status FROM Manuscript WHERE PrimaryAuthorId = %d GROUP BY Status;" % self.id
+
+        # initialize a cursor
+        cursor = self.con.cursor()
+
+        # query db
+        cursor.execute(query)
+
+        for row in cursor:
+            print("".join(["{:<12}".format(col) for col in row]))
+
+        cursor.close()
 
     def submit(self, title, affiliation, ri, secondaryAuths, filename):
         return

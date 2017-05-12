@@ -11,7 +11,7 @@ class Reviewer:
         return
 
     def status(self):
-        return
+        return "got here"
 
     def review(self, manuscriptId, appropriateness, clarity, methodology, fieldContribution, recommendation):
         return
