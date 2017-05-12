@@ -9,6 +9,7 @@ class Editor:
     def status(self):
         print "got here"
 
+
     def assign(self, manuscriptId, reviewerId):
         return
 
