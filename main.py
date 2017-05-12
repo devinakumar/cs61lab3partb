@@ -9,24 +9,27 @@ from __future__ import print_function        # make print a function
 import mysql.connector                       # mysql functionality
 import sys                                   # for misc errors
 import shlex                                 # for parsing
+from editor import Editor 
+from reviewer import Reviewer 
+from author import Author
+
 
 SERVER   = "sunapee.cs.dartmouth.edu"        # db server to connect to
 USERNAME = "hwilson"                            # user to connect as
 PASSWORD = "Password1"                            # user's password
 DATABASE = "hwilson2_db"                              # db to user
 
-UserId = 0
-UserType = ""
+user = None
 
 def login(input):
   try:
-    UserType = input[1].capitalize()
-    UserId = int(input[2])
+    userType = input[1].capitalize()
+    userId = int(input[2])
 
-    if UserType not in ['Editor','Reviewer','Author']:
+    if userType not in ['Editor','Reviewer','Author']:
       return
 
-    QUERY = "SELECT COUNT(*) FROM %s WHERE %sId = %d" % (UserType,UserType,UserId)
+    QUERY = "SELECT COUNT(*) FROM %s WHERE %sId = %d" % (userType,userType,userId)
 
     # initialize a cursor
     cursor = con.cursor()
@@ -36,7 +39,14 @@ def login(input):
     result = cursor.fetchone()
 
     if result[0] == 1:
-      print("Welcome")
+      if userType == "Editor":
+        user = Editor(userId, con)
+      elif userType == "Reviewer":
+        user = Reviewer(userId, con)
+      elif userType == "Author":
+        user = Author(userId, con)
+
+      print("Welcome, %d" % user.id)
 
     cursor.close()
   except (ValueError,IndexError):
@@ -54,7 +64,7 @@ if __name__ == "__main__":
           input = shlex.split(raw_input('> '))
 
           if input[0] == 'login':
-            login(input)
+            user = login(input)
           else:
             print("Ok")
         except ValueError:
