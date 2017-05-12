@@ -1,8 +1,10 @@
+#!/usr/bin/env python
+
 """
   dbexample.java
   Ira Ray Jenkins
 
-  This simple example demonstrates connecting to a MySQL database and 
+  This simple example demonstrates connecting to a MySQL database and
   executing a sample query.
 """
 from __future__ import print_function        # make print a function
@@ -33,7 +35,7 @@ def login(input):
 
     # query db
     cursor.execute(QUERY)
-    
+
     print("Query executed: '{0}'\n\nResults:".format(QUERY))
 
     # print table header
@@ -70,8 +72,8 @@ if __name__ == "__main__":
       print("SQL Error: {0}".format(e.msg))
    except:                                   # anything else
       print("Unexpected error: {0}".format(sys.exc_info()[0]))
-   
+
    # cleanup
    con.close()
-   
+
    print("\nConnection terminated.", end='')
