@@ -1,3 +1,7 @@
+from __future__ import print_function        # make print a function
+import mysql.connector                       # mysql functionality
+import sys                                   # for misc errors
+
 class Reviewer:
     def __init__(self, id, connection):
         self.id = id
