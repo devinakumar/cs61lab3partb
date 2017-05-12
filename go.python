@@ -1,9 +1,9 @@
 """
-  dbexample.java
-  Ira Ray Jenkins
+  go.python
 
-  This simple example demonstrates connecting to a MySQL database and 
-  executing a sample query.
+  Henry Wilson & Devina Kumar
+
+  Python 2.7.10
 """
 from __future__ import print_function        # make print a function
 import mysql.connector                       # mysql functionality
@@ -26,24 +26,18 @@ def login(input):
     if UserType not in ['Editor','Reviewer','Author']:
       return
 
-    QUERY = "SELECT * FROM %s WHERE %sId = %d" % (UserType,UserType,UserId)
+    QUERY = "SELECT COUNT(*) FROM %s WHERE %sId = %d" % (UserType,UserType,UserId)
 
     # initialize a cursor
     cursor = con.cursor()
 
     # query db
     cursor.execute(QUERY)
+    result = cursor.fetchone()
+
+    if result[0] == 1:
+      print("Welcome")
     
-    print("Query executed: '{0}'\n\nResults:".format(QUERY))
-
-    # print table header
-    print("".join(["{:<12}".format(col) for col in cursor.column_names]))
-    print("--------------------------------------------")
-
-    # iterate through results
-    for row in cursor:
-       print("".join(["{:<12}".format(col) for col in row]))
-
     cursor.close()
   except (ValueError,IndexError):
     print ("User does not exist")
