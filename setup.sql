@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS `devina_db`.`Manuscript` (
   `Document` BLOB NOT NULL,
   `JournalIssueYear` INT(11) NULL DEFAULT NULL,
   `JournalIssuePeriod` ENUM('1', '2', '3', '4') NULL DEFAULT NULL,
-  `PrimaryAuthorAffiliation` VARCHAR(45) NOT NULL,
+  `PrimaryAuthorAffiliation` VARCHAR(100) NOT NULL,
   `DateAcceptReject` DATETIME NULL DEFAULT NULL,
   PRIMARY KEY (`ManuscriptId`),
   INDEX `fk_Manuscript_RICodes_idx` (`RICode` ASC),
@@ -208,7 +208,7 @@ CREATE TABLE IF NOT EXISTS `devina_db`.`PrimaryAuthor` (
   `LastName` VARCHAR(45) NOT NULL,
   `Email` VARCHAR(100) NOT NULL,
   `MailingAddress` VARCHAR(150) NOT NULL,
-  `Affiliation` VARCHAR(45) NULL DEFAULT NULL,
+  `Affiliation` VARCHAR(100) NULL DEFAULT NULL,
   PRIMARY KEY (`PrimaryAuthorId`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
@@ -233,7 +233,7 @@ CREATE TABLE IF NOT EXISTS `devina_db`.`Reviewer` (
   `FirstName` VARCHAR(45) NOT NULL,
   `LastName` VARCHAR(45) NOT NULL,
   `Email` VARCHAR(100) NOT NULL,
-  `Affiliation` VARCHAR(45) NOT NULL,
+  `Affiliation` VARCHAR(100) NOT NULL,
   `Retired` TINYINT(4) NOT NULL,
   PRIMARY KEY (`ReviewerId`))
 ENGINE = InnoDB
