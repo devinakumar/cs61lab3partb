@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from __future__ import print_function        # make print a function
 import mysql.connector                       # mysql functionality
 import sys                                   # for misc errors
@@ -12,7 +14,7 @@ class PrimaryAuthor:
 
     def status(self):
 
-        print "Welcome back!"
+        print("Welcome back!")
 
         query = "SELECT FirstName, LastName, MailingAddress FROM PrimaryAuthor WHERE PrimaryAuthorId = %d;" % self.id
 

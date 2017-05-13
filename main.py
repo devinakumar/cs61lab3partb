@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """
   go.python
 
@@ -49,6 +51,45 @@ def login(input):
   except (ValueError,IndexError):
     print ("User does not exist")
 
+def register(input, con):
+    try:
+        userType = input[1].capitalize()
+
+    # # initialize a cursor
+    # cursor = con.cursor()
+    #
+    # # query db
+    # cursor.execute(query)
+    # result = cursor.fetchone()
+
+        if userType == "Editor":
+            registerEditor(con, input[2], input[3])
+        elif userType == "Reviewer":
+            return Reviewer(userId, con)
+        elif userType == "PrimaryAuthor":
+            return PrimaryAuthor(userId, con)
+    # cursor.close()
+    except NameError, e:
+        print(e)
+
+def registerEditor(con, fname, lname):
+    try:
+        query = "INSERT INTO Editor (FirstName, LastName) VALUES ('%s', '%s')" % (fname,lname)
+
+        # initialize a cursor and query db
+        cursor = con.cursor()
+        cursor.execute(query)
+        con.commit()
+        print("herere")
+        # except:
+        #     print("herereytftyf")
+        #     con.rollback()
+        cursor.close()
+
+
+    except (ValueError,IndexError, NameError):
+      print ("User does not exist")
+
 if __name__ == "__main__":
    try:
       # initialize db connection
@@ -65,13 +106,11 @@ if __name__ == "__main__":
             user.status()
           elif command == 'status':
             user.status()
-          else:
-            print("Ok")
-        except ValueError:
-          print("Invalid input")
+          elif command == 'register':
+            register(input, con)
 
-   except mysql.connector.Error as e:        # catch SQL errors
-      print("SQL Error: {0}".format(e.msg))
+        except mysql.connector.Error as e:        # catch SQL errors
+            print("SQL Error: {0}".format(e.msg))
    except:                                   # anything else
       print("Unexpected error: {0}".format(sys.exc_info()[0]))
 
