@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS `devina_db`.`Manuscript` (
   `PagesOccupied` INT(11) NULL DEFAULT NULL,
   `StartingPage` INT(11) NULL DEFAULT NULL,
   `Order` INT(11) NULL DEFAULT NULL,
-  `Document` BLOB NOT NULL,
+  `Document` VARCHAR(100) NOT NULL,
   `JournalIssueYear` INT(11) NULL DEFAULT NULL,
   `JournalIssuePeriod` ENUM('1', '2', '3', '4') NULL DEFAULT NULL,
   `PrimaryAuthorAffiliation` VARCHAR(100) NOT NULL,
