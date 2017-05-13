@@ -81,10 +81,19 @@ class Editor:
         cursor2.close()
 
         # if they match, assign a manuscript by creating a review assigned to the reviewer with a timestamp
-        timestamp = str(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-        query3 = "INSERT INTO ReviewerInterests (RICode, ReviewerId) VALUES (%d, %d)" % (ri, reviewerID)
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        query3 = "INSERT INTO Review (ManuscriptId, ReviewerId, DateSent) VALUES (%d, %d, '%s')" % (manuscriptId, reviewerId, timestamp)
+        cursor3 = self.con.cursor()
+        cursor3.execute(query3)
+        self.con.commit()
+        cursor3.close()
 
         # change manuscript status to Under Review
+        cursor4 = self.con.cursor()
+        query4 = "UPDATE Manuscript SET Status='%s' WHERE ManuscriptId=%d" % ('Under Review', manuscriptId)
+        cursor4.execute(query4)
+        self.con.commit()
+        cursor4.close()
         return
 
     def reject(self, manuscriptId):
