@@ -190,6 +190,8 @@ if __name__ == "__main__":
             register(input, con)
           elif command == 'list':
             user.list()
+          elif command == 'assign':
+            user.assign(int(input[1]), int(input[2]))
           elif command == 'submit':
             print(type(user))
             if isinstance(user, PrimaryAuthor):

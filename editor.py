@@ -68,7 +68,7 @@ class Editor:
             cursor.close()
             return
         cursor.close()
-
+        print("first stage of assign done")
         # check if manuscript RI and reviewer RI match
         query2 = "SELECT RICode FROM Manuscript WHERE ReviewerId = %d" % (reviewerId)
         cursor2 = self.con.cursor()
