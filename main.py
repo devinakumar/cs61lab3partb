@@ -207,6 +207,9 @@ if __name__ == "__main__":
       print("Unexpected error: {0}".format(sys.exc_info()[0]))
 
    # cleanup
-   con.close()
+   try:
+    con.close()
+   except NameError:
+    pass
 
    print("\nConnection terminated.", end='')
