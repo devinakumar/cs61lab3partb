@@ -4,6 +4,7 @@ from __future__ import print_function        # make print a function
 import mysql.connector                       # mysql functionality
 import sys                                   # for misc errors
 
+
 class PrimaryAuthor:
     def __init__(self, id, connection):
         self.id = id
@@ -60,7 +61,7 @@ class PrimaryAuthor:
 
         cursor.close()
 
-    def submit(self,input):
+    def submit(self, input):
         try:
             if (len(input) < 5):
                 raise ValueError('')
