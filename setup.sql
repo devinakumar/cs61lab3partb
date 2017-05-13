@@ -3,31 +3,29 @@
 -- Model: New Model
 -- Version: 1.0
 -- Project: Name of the project
--- Author: Henry Wilson
+-- Author: Devina
 
-USE `hwilson2_db`;
+USE `devina_db`;
 
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
+SET SQL_SAFE_UPDATES=0;
+
+DROP TABLE IF EXISTS `devina_db`.`Manuscript`;
+DROP TABLE IF EXISTS `devina_db`.`PrimaryAuthor`;
+DROP TABLE IF EXISTS `devina_db`.`SecondaryAuthor`;
+DROP TABLE IF EXISTS `devina_db`.`Editor`;
+DROP TABLE IF EXISTS `devina_db`.`RICodes`;
+DROP TABLE IF EXISTS `devina_db`.`ReviewerInterests`;
+DROP TABLE IF EXISTS `devina_db`.`Reviewer`;
+DROP TABLE IF EXISTS `devina_db`.`Review`;
+DROP TABLE IF EXISTS `devina_db`.`JournalIssue`;
 
 DROP TRIGGER IF EXISTS Manuscript_RICode;
 DROP TRIGGER IF EXISTS Reviewer_Resigns;
 
-DROP TABLE IF EXISTS `hwilson2_db`.`Manuscript`;
-DROP TABLE IF EXISTS `hwilson2_db`.`PrimaryAuthor`;
-DROP TABLE IF EXISTS `hwilson2_db`.`SecondaryAuthor`;
-DROP TABLE IF EXISTS `hwilson2_db`.`Editor`;
-DROP TABLE IF EXISTS `hwilson2_db`.`RICodes`;
-DROP TABLE IF EXISTS `hwilson2_db`.`ReviewerInterests`;
-DROP TABLE IF EXISTS `hwilson2_db`.`Reviewer`;
-DROP TABLE IF EXISTS `hwilson2_db`.`Review`;
-DROP TABLE IF EXISTS `hwilson2_db`.`JournalIssue`;
-
-DROP TRIGGER IF EXISTS Manuscript_RICode;
-DROP TRIGGER IF EXISTS Reviewer_Resigns;
-
-CREATE TABLE IF NOT EXISTS `hwilson2_db`.`Manuscript` (
+CREATE TABLE IF NOT EXISTS `devina_db`.`Manuscript` (
   `ManuscriptId` INT(11) NOT NULL AUTO_INCREMENT,
   `Title` VARCHAR(45) NOT NULL,
   `DateReceived` DATETIME NOT NULL,
@@ -41,6 +39,9 @@ CREATE TABLE IF NOT EXISTS `hwilson2_db`.`Manuscript` (
   `Document` BLOB NOT NULL,
   `JournalIssueYear` INT(11) NULL DEFAULT NULL,
   `JournalIssuePeriod` ENUM('1', '2', '3', '4') NULL DEFAULT NULL,
+  `PrimaryAuthorAffiliation` VARCHAR(45) NOT NULL,
+  `DateAccepted` DATETIME NULL DEFAULT NULL,
+  `DateRejected` DATETIME NULL DEFAULT NULL,
   PRIMARY KEY (`ManuscriptId`),
   INDEX `fk_Manuscript_RICodes_idx` (`RICode` ASC),
   INDEX `fk_Manuscript_PrimaryAuthor1_idx` (`PrimaryAuthorId` ASC),
@@ -48,22 +49,22 @@ CREATE TABLE IF NOT EXISTS `hwilson2_db`.`Manuscript` (
   INDEX `fk_Manuscript_JournalIssue2_idx` (`JournalIssueYear` ASC, `JournalIssuePeriod` ASC),
   CONSTRAINT `fk_Manuscript_RICodes`
     FOREIGN KEY (`RICode`)
-    REFERENCES `hwilson2_db`.`RICodes` (`code`)
+    REFERENCES `devina_db`.`RICodes` (`code`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_Manuscript_PrimaryAuthor1`
     FOREIGN KEY (`PrimaryAuthorId`)
-    REFERENCES `hwilson2_db`.`PrimaryAuthor` (`PrimaryAuthorId`)
+    REFERENCES `devina_db`.`PrimaryAuthor` (`PrimaryAuthorId`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_Manuscript_Editor1`
     FOREIGN KEY (`EditorId`)
-    REFERENCES `hwilson2_db`.`Editor` (`EditorId`)
+    REFERENCES `devina_db`.`Editor` (`EditorId`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_Manuscript_JournalIssue2`
     FOREIGN KEY (`JournalIssueYear` , `JournalIssuePeriod`)
-    REFERENCES `hwilson2_db`.`JournalIssue` (`Year` , `Period`)
+    REFERENCES `devina_db`.`JournalIssue` (`Year` , `Period`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -202,18 +203,18 @@ INSERT INTO RICodes (interest) VALUES
 ('Web engineering'),
 ('Systems engineering');
 
-CREATE TABLE IF NOT EXISTS `hwilson2_db`.`PrimaryAuthor` (
+CREATE TABLE IF NOT EXISTS `devina_db`.`PrimaryAuthor` (
   `PrimaryAuthorId` INT(11) NOT NULL AUTO_INCREMENT,
   `FirstName` VARCHAR(45) NOT NULL,
   `LastName` VARCHAR(45) NOT NULL,
   `Email` VARCHAR(100) NOT NULL,
   `MailingAddress` VARCHAR(150) NOT NULL,
-  `Affiliation` VARCHAR(45) NULL,
+  `Affiliation` VARCHAR(45) NULL DEFAULT NULL,
   PRIMARY KEY (`PrimaryAuthorId`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
-CREATE TABLE IF NOT EXISTS `hwilson2_db`.`SecondaryAuthor` (
+CREATE TABLE IF NOT EXISTS `devina_db`.`SecondaryAuthor` (
   `BylinePosition` INT(11) NOT NULL,
   `ManuscriptId` INT(11) NOT NULL,
   `FirstName` VARCHAR(45) NOT NULL,
@@ -222,13 +223,13 @@ CREATE TABLE IF NOT EXISTS `hwilson2_db`.`SecondaryAuthor` (
   INDEX `fk_SecondaryAuthor_Manuscript1_idx` (`ManuscriptId` ASC),
   CONSTRAINT `fk_SecondaryAuthor_Manuscript1`
     FOREIGN KEY (`ManuscriptId`)
-    REFERENCES `hwilson2_db`.`Manuscript` (`ManuscriptId`)
+    REFERENCES `devina_db`.`Manuscript` (`ManuscriptId`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
-CREATE TABLE IF NOT EXISTS `hwilson2_db`.`Reviewer` (
+CREATE TABLE IF NOT EXISTS `devina_db`.`Reviewer` (
   `ReviewerId` INT(11) NOT NULL AUTO_INCREMENT,
   `FirstName` VARCHAR(45) NOT NULL,
   `LastName` VARCHAR(45) NOT NULL,
@@ -239,7 +240,7 @@ CREATE TABLE IF NOT EXISTS `hwilson2_db`.`Reviewer` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
-CREATE TABLE IF NOT EXISTS `hwilson2_db`.`Review` (
+CREATE TABLE IF NOT EXISTS `devina_db`.`Review` (
   `ManuscriptId` INT(11) NOT NULL,
   `ReviewerId` INT(11) NOT NULL,
   `Appropriateness` ENUM('1', '2', '3', '4', '5', '6', '7', '8', '9', '10') NULL DEFAULT NULL,
@@ -254,18 +255,18 @@ CREATE TABLE IF NOT EXISTS `hwilson2_db`.`Review` (
   INDEX `fk_Review_Manuscript1_idx` (`ManuscriptId` ASC),
   CONSTRAINT `fk_Review_Reviewer1`
     FOREIGN KEY (`ReviewerId`)
-    REFERENCES `hwilson2_db`.`Reviewer` (`ReviewerId`)
+    REFERENCES `devina_db`.`Reviewer` (`ReviewerId`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_Review_Manuscript1`
     FOREIGN KEY (`ManuscriptId`)
-    REFERENCES `hwilson2_db`.`Manuscript` (`ManuscriptId`)
+    REFERENCES `devina_db`.`Manuscript` (`ManuscriptId`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
-CREATE TABLE IF NOT EXISTS `hwilson2_db`.`Editor` (
+CREATE TABLE IF NOT EXISTS `devina_db`.`Editor` (
   `EditorId` INT(11) NOT NULL AUTO_INCREMENT,
   `FirstName` VARCHAR(45) NOT NULL,
   `LastName` VARCHAR(45) NOT NULL,
@@ -273,7 +274,7 @@ CREATE TABLE IF NOT EXISTS `hwilson2_db`.`Editor` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
-CREATE TABLE IF NOT EXISTS `hwilson2_db`.`JournalIssue` (
+CREATE TABLE IF NOT EXISTS `devina_db`.`JournalIssue` (
   `Year` INT(11) NOT NULL,
   `Period` ENUM('1', '2', '3', '4') NOT NULL,
   `PrintDate` DATETIME NULL DEFAULT NULL,
@@ -281,19 +282,19 @@ CREATE TABLE IF NOT EXISTS `hwilson2_db`.`JournalIssue` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
-CREATE TABLE IF NOT EXISTS `hwilson2_db`.`ReviewerInterests` (
+CREATE TABLE IF NOT EXISTS `devina_db`.`ReviewerInterests` (
   `RICode` MEDIUMINT NOT NULL,
   `ReviewerId` INT(11) NOT NULL,
   PRIMARY KEY (`RICode`, `ReviewerId`),
   INDEX `fk_ReviewerInterests_Reviewer1_idx` (`ReviewerId` ASC),
   CONSTRAINT `fk_ReviewerInterests_Reviewer1`
     FOREIGN KEY (`ReviewerId`)
-    REFERENCES `hwilson2_db`.`Reviewer` (`ReviewerId`)
+    REFERENCES `devina_db`.`Reviewer` (`ReviewerId`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_ReviewerInterests_RICodes1`
     FOREIGN KEY (`RICode`)
-    REFERENCES `hwilson2_db`.`RICodes` (`code`)
+    REFERENCES `devina_db`.`RICodes` (`code`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -307,15 +308,15 @@ SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 
 SET FOREIGN_KEY_CHECKS = 0;
 
-TRUNCATE TABLE `hwilson2_db`.`Manuscript`;
-TRUNCATE TABLE `hwilson2_db`.`PrimaryAuthor`;
-TRUNCATE TABLE `hwilson2_db`.`SecondaryAuthor`;
-TRUNCATE TABLE `hwilson2_db`.`Editor`;
--- TRUNCATE TABLE `hwilson2_db`.`RICodes`;
-TRUNCATE TABLE `hwilson2_db`.`ReviewerInterests`;
-TRUNCATE TABLE `hwilson2_db`.`Reviewer`;
-TRUNCATE TABLE `hwilson2_db`.`Review`;
-TRUNCATE TABLE `hwilson2_db`.`JournalIssue`;
+TRUNCATE TABLE `devina_db`.`Manuscript`;
+TRUNCATE TABLE `devina_db`.`PrimaryAuthor`;
+TRUNCATE TABLE `devina_db`.`SecondaryAuthor`;
+TRUNCATE TABLE `devina_db`.`Editor`;
+-- TRUNCATE TABLE `devina_db`.`RICodes`;
+TRUNCATE TABLE `devina_db`.`ReviewerInterests`;
+TRUNCATE TABLE `devina_db`.`Reviewer`;
+TRUNCATE TABLE `devina_db`.`Review`;
+TRUNCATE TABLE `devina_db`.`JournalIssue`;
 
 SET FOREIGN_KEY_CHECKS = 1;
 
@@ -945,62 +946,3 @@ AS
   FROM Review as r
     INNER JOIN Manuscript as m ON r.ManuscriptId = m.ManuscriptId
   ORDER BY r.DateCompleted;
-
-
--- Trigger 1: When an author is submitting a new manuscript
--- to the system with an RICode for which there is no reviewer
--- who handles that RICode you should raise an exception that
--- informs the author the paper can not be considered at this time.
-
-DELIMITER /
-
-CREATE TRIGGER Manuscript_RICode BEFORE INSERT ON Manuscript
-FOR EACH ROW
-BEGIN
-  DECLARE signal_message VARCHAR(128);
-  IF ((SELECT COUNT(*) FROM ReviewerInterests AS ri
-      INNER JOIN Reviewer AS r ON r.ReviewerId = ri.ReviewerId
-      WHERE r.Retired = '0' AND ri.RICode = new.RICode)
-    < 3)
-  THEN
-    SET signal_message = CONCAT('UserException: Less than 3 reviewers are interested in the RICode =', CAST(new.RICode as CHAR));
-    SIGNAL SQLSTATE '45000' SET message_text = signal_message;
-  END IF;
-END
-/
-
-DELIMITER ;
-
--- Trigger 2: When a reviewer resigns any manuscript in
--- “UnderReview” state for which that reviewer was the only
--- reviewer, that manuscript must be reset to “submitted”
--- state and an apprpriate exception message displayed.
-
-DELIMITER /
-
-CREATE TRIGGER Reviewer_Resigns BEFORE UPDATE ON Reviewer
-FOR EACH ROW
-BEGIN
-  IF (new.Retired = '1' AND old.Retired = '0')
-  THEN
-    -- Here we need to set all manuscripts with <3 reviewers
-    -- that was in a "UnderReview" state to "Received"
-    -- However, since the update hasn't happened yet,
-    -- we need to set any where manuscript <= 3 reviewers
-    UPDATE Manuscript SET `Status` = 'Received'
-    WHERE `Status` = 'Under Review' AND ManuscriptId IN (
-      SELECT ManuscriptId FROM Review as r
-      INNER JOIN Reviewer as v ON v.ReviewerId = r.ReviewerId
-            WHERE v.Retired = '0' AND  r.ManuscriptId IN (
-        SELECT r2.ManuscriptId FROM Review as r2
-                WHERE r2.ReviewerId = old.ReviewerId
-      )
-            GROUP BY r.ManuscriptId
-            HAVING COUNT(r.ManuscriptId) < 4
-    );
-  END IF;
-END
-/
-
-DELIMITER ;
-
