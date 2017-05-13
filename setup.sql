@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS `devina_db`.`Manuscript` (
   `PagesOccupied` INT(11) NULL DEFAULT NULL,
   `StartingPage` INT(11) NULL DEFAULT NULL,
   `Order` INT(11) NULL DEFAULT NULL,
-  `Document` BLOB NOT NULL,
+  `Document` VARCHAR(100) NOT NULL,
   `JournalIssueYear` INT(11) NULL DEFAULT NULL,
   `JournalIssuePeriod` ENUM('1', '2', '3', '4') NULL DEFAULT NULL,
   `PrimaryAuthorAffiliation` VARCHAR(100) NOT NULL,
@@ -945,3 +945,62 @@ AS
   FROM Review as r
     INNER JOIN Manuscript as m ON r.ManuscriptId = m.ManuscriptId
   ORDER BY r.DateCompleted;
+
+
+
+-- Trigger 1: When an author is submitting a new manuscript
+-- to the system with an RICode for which there is no reviewer
+-- who handles that RICode you should raise an exception that
+-- informs the author the paper can not be considered at this time.
+
+DELIMITER /
+
+CREATE TRIGGER Manuscript_RICode BEFORE INSERT ON Manuscript
+FOR EACH ROW
+BEGIN
+  DECLARE signal_message VARCHAR(128);
+  IF ((SELECT COUNT(*) FROM ReviewerInterests AS ri
+      INNER JOIN Reviewer AS r ON r.ReviewerId = ri.ReviewerId
+      WHERE r.Retired = '0' AND ri.RICode = new.RICode)
+    < 3)
+  THEN
+    SET signal_message = CONCAT('UserException: Less than 3 reviewers are interested in the RICode =', CAST(new.RICode as CHAR));
+    SIGNAL SQLSTATE '45000' SET message_text = signal_message;
+  END IF;
+END
+/
+
+DELIMITER ;
+
+-- Trigger 2: When a reviewer resigns any manuscript in
+-- “UnderReview” state for which that reviewer was the only
+-- reviewer, that manuscript must be reset to “submitted”
+-- state and an apprpriate exception message displayed.
+
+DELIMITER /
+
+CREATE TRIGGER Reviewer_Resigns BEFORE UPDATE ON Reviewer
+FOR EACH ROW
+BEGIN
+  IF (new.Retired = '1' AND old.Retired = '0')
+  THEN
+    -- Here we need to set all manuscripts with <3 reviewers
+    -- that was in a "UnderReview" state to "Received"
+    -- However, since the update hasn't happened yet,
+    -- we need to set any where manuscript <= 3 reviewers
+    UPDATE Manuscript SET `Status` = 'Received'
+    WHERE `Status` = 'Under Review' AND ManuscriptId IN (
+      SELECT ManuscriptId FROM Review as r
+      INNER JOIN Reviewer as v ON v.ReviewerId = r.ReviewerId
+            WHERE v.Retired = '0' AND  r.ManuscriptId IN (
+        SELECT r2.ManuscriptId FROM Review as r2
+                WHERE r2.ReviewerId = old.ReviewerId
+      )
+            GROUP BY r.ManuscriptId
+            HAVING COUNT(r.ManuscriptId) < 4
+    );
+  END IF;
+END
+/
+
+DELIMITER ;

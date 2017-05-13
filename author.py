@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
 from __future__ import print_function        # make print a function
-import mysql.connector                       # mysql functionality
-import sys                                   # for misc errors
+from datetime import datetime                # get datetime
+# import mysql.connector                       # mysql functionality
+# import sys                                   # for misc errors
 
 
 class PrimaryAuthor:
@@ -67,7 +68,7 @@ class PrimaryAuthor:
                 raise ValueError('')
             title = input[1]
             affiliation = input[2]
-            RICode = input[3]
+            RICode = int(input[3])
             secondaryAuthors = input[4:-1]  # index 3 through 2nd to last
             filename = input[-1]
             self.submitHelper(title, affiliation, RICode, secondaryAuthors, filename)
@@ -75,9 +76,51 @@ class PrimaryAuthor:
             print ("Invalid. Usage: submit <title> <Affiliation> <RICode> <author2> <author3> <author4> <filename>")
 
     def submitHelper(self, title, affiliation, ri, secondaryAuths, filename):
-        print("Title: %s, Affiliation: %s, RICode: %s, Filename: %s" % (title, affiliation, ri, filename))
-        for author in secondaryAuths:
-            print("SecondaryAuthor: %s" % author)
+        manuscriptID = -1
+
+        # First we need to update the author's affiliation
+        query = "UPDATE PrimaryAuthor SET Affiliation = '%s' WHERE PrimaryAuthorId = %d" % (affiliation, self.id)
+
+        # initialize a cursor and query db
+        authorCursor = self.con.cursor(buffered=True)
+        try:
+            authorCursor.execute(query)
+            self.con.commit()
+        except IndexError, e:
+            print(e)
+            self.con.rollback()
+        authorCursor.close()
+
+        # Now we need to perform the insert and return the manuscript ID
+        date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        status = "Received"
+
+        # Get the editor ID as the lowest ID #
+        query = "SELECT EditorId FROM Editor ORDER BY EditorID"
+        editorCursor = self.con.cursor(buffered=True)
+        editorCursor.execute(query)
+        result = editorCursor.fetchone()
+        print("result is %s" % result)
+        editorID = int(result[0])
+        print("editorID is %d" % editorID)
+        print("editorID is %d" % editorID)
+
+        query = "INSERT INTO Manuscript (Title, DateReceived, Status, RICode, PrimaryAuthorID, EditorID, PrimaryAuthorAffiliation, Document) VALUES ('%s', '%s', '%s', %d, %d, %d, '%s', '%s');" % (title, date, status, ri, self.id, editorID, affiliation, filename)
+
+        # initialize a cursor and query db
+        cursor = self.con.cursor(buffered=True)
+        try:
+            cursor.execute(query)
+            self.con.commit()
+            manuscriptID = cursor.lastrowid
+        except IndexError, e:
+            print(e)
+            self.con.rollback()
+
+        print("Created a manuscript with ID=%s" % manuscriptID)
+        cursor.close()
+        editorCursor.close()
+
         return
 
     def retract(self, manuscriptId):
