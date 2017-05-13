@@ -85,7 +85,6 @@ def registerEditor(con, fname, lname):
         try:
             cursor.execute(query)
             con.commit()
-            print(cursor.lastrowid)
         # print("herere")
         except(ValueError,IndexError, NameError):
             print("could not register editor")
@@ -97,11 +96,16 @@ def registerEditor(con, fname, lname):
 
 def registerReviewer(con, input):
     print("in register reviewer beginning")
-    fname = input[2]
-    lname = input[3]
-    email = input[4]
-    affiliation = input[5]
-    retired = 0
+    riCodes = len(input) - 6
+    if len(input) >= 7 and len(input) <= 9:
+        fname = input[2]
+        lname = input[3]
+        email = input[4]
+        affiliation = input[5]
+        retired = 0
+    else:
+        print("Please register a reviewer with the following format:\nregister reviewer FirstName LastName Email Affiliation RICode [RICode] [RICode]")
+
     try:
         query = "INSERT INTO Reviewer (FirstName, LastName, Email, Affiliation, Retired) VALUES ('%s', '%s', '%s', '%s', '%s')" % (fname,lname, email, affiliation, retired)
 
@@ -110,10 +114,15 @@ def registerReviewer(con, input):
         try:
             cursor.execute(query)
             con.commit()
-
+            reviewerID = cursor.lastrowid
+            for x in range(0, riCodes):
+                print(x)
+                registerReviewerInterest(con, int(reviewerID), int(input[6+x]))
+            # print(cursor.lastrowid)
             # print("herere")
-        except(ValueError,IndexError, NameError):
-            print("EXCEPT IN REGISTER AUTHOR")
+        except IndexError, e:
+            print(e)
+            print("EXCEPT IN REGISTER REVIEWER")
             con.rollback()
         cursor.close()
 
@@ -121,6 +130,19 @@ def registerReviewer(con, input):
     #   print("User does not exist")
     except TypeError, e:
         print(e)
+
+def registerReviewerInterest(con, reviewerID, ri):
+    query = "INSERT INTO ReviewerInterests (RICode, ReviewerId) VALUES (%d, %d)" % (ri, reviewerID)
+    cursor = con.cursor()
+    try:
+        cursor.execute(query)
+        con.commit()
+        print("registering reviewer interests")
+    except(ValueError,IndexError, NameError):
+        print("EXCEPT IN REGISTER REVIEWER INTEREST")
+        con.rollback()
+    cursor.close()
+
 
 def registerAuthor(con, fname, lname, email, address):
     print("in register author beginning")
