@@ -17,9 +17,9 @@ from author import PrimaryAuthor
 
 
 SERVER = "sunapee.cs.dartmouth.edu"        # db server to connect to
-USERNAME = "hwilson"                            # user to connect as
-PASSWORD = "Password1"                            # user's password
-DATABASE = "hwilson2_db"                              # db to user
+USERNAME = "devina"                            # user to connect as
+PASSWORD = "Devina.Kumar"                            # user's password
+DATABASE = "devina_db"                              # db to user
 
 user = None
 
@@ -189,6 +189,8 @@ if __name__ == "__main__":
           elif command == 'register':
             print("here in main register")
             register(input, con)
+          elif command == 'list':
+            user.list()
 
         except mysql.connector.Error as e:        # catch SQL errors
             print("SQL Error: {0}".format(e.msg))

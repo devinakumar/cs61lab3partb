@@ -31,15 +31,32 @@ class PrimaryAuthor:
 
     def status(self):
         # Retrieve manuscript status counts
-        query = ("SELECT Status, COUNT(*) as `Number` FROM Manuscript WHERE PrimaryAuthorId = %d GROUP BY Status;" % self.id)
+        query = ("SELECT COUNT(*) as `Number`, Status FROM Manuscript WHERE PrimaryAuthorId = %d GROUP BY Status;" % self.id)
 
         # initialize a cursor and query db
         cursor = self.con.cursor()
         cursor.execute(query)
 
-        print("Manuscripts:")
+        statuses = {'Received': 0, 'Under Review': 0, 'Rejected': 0, 'Accepted': 0, 'Typeset': 0, 'Scheduled': 0, 'Published': 0}
+
         for row in cursor:
-            print("".join(["{}: {}".format(col) for col in row]))
+            statuses[row[1]] = row[0]
+
+        for status, count in statuses.iteritems():
+            print("%s: %d" % (status, count))
+
+        cursor.close()
+
+    def list(self):
+        # Retrieve manuscript status counts
+        query = ("SELECT ManuscriptId, Title, Status FROM Manuscript WHERE PrimaryAuthorId = %d ORDER BY FIELD(Status, 'Received', 'Under Review', 'Rejected', 'Accepted', 'Typeset', 'Scheduled', 'Published'), ManuscriptId;" % self.id)
+
+        # initialize a cursor and query db
+        cursor = self.con.cursor()
+        cursor.execute(query)
+
+        for row in cursor:
+            print("ID %s | %s | %s" % (row[0], row[1], row[2]))
 
         cursor.close()
 
