@@ -75,9 +75,6 @@ class PrimaryAuthor:
             print ("Invalid. Usage: submit <title> <Affiliation> <RICode> <author2> <author3> <author4> <filename>")
 
     def submitHelper(self, title, affiliation, ri, secondaryAuths, filename):
-        print("Title: %s, Affiliation: %s, RICode: %s, Filename: %s" % (title, affiliation, ri, filename))
-        for author in secondaryAuths:
-            print("SecondaryAuthor: %s" % author)
         return
 
     def retract(self, manuscriptId):
