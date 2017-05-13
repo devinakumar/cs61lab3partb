@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+
+from __future__ import print_function        # make print a function
+import mysql.connector                       # mysql functionality
+import sys                                   # for misc errors
+
 class PrimaryAuthor:
     def __init__(self, id, connection):
         self.id = id
@@ -18,20 +24,20 @@ class PrimaryAuthor:
         fullName = "%s %s" % (info[0], info[1])
         mailingAddress = info[2]
 
-        print "Welcome back, %s!" % fullName
-        print "Your mailing address is %s\n" % mailingAddress
+        print("Welcome back, %s!" % fullName)
+        print("Your mailing address is %s\n" % mailingAddress)
 
         cursor.close()
 
     def status(self):
         # Retrieve manuscript status counts
-        query = "SELECT Status, COUNT(*) as `Number` FROM Manuscript WHERE PrimaryAuthorId = %d GROUP BY Status;" % self.id
+        query = ("SELECT Status, COUNT(*) as `Number` FROM Manuscript WHERE PrimaryAuthorId = %d GROUP BY Status;" % self.id)
 
         # initialize a cursor and query db
         cursor = self.con.cursor()
         cursor.execute(query)
 
-        print "Manuscripts:"
+        print("Manuscripts:")
         for row in cursor:
             print("".join(["{}: {}".format(col) for col in row]))
 

@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+
+from __future__ import print_function        # make print a function
+import mysql.connector                       # mysql functionality
+import sys                                   # for misc errors
+
 class Reviewer:
     def __init__(self, id, connection):
         self.id = id
@@ -7,11 +13,11 @@ class Reviewer:
         return
 
     def resign(self):
-        print "Thank you for your service."
+        print("Thank you for your service.")
         return
 
     def status(self):
-        return "got here"
+        return
 
     def review(self, manuscriptId, appropriateness, clarity, methodology, fieldContribution, recommendation):
         return
