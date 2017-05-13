@@ -189,6 +189,8 @@ if __name__ == "__main__":
           elif command == 'register':
             print("here in main register")
             register(input, con)
+          elif command == 'list':
+            user.list()
 
         except mysql.connector.Error as e:        # catch SQL errors
             print("SQL Error: {0}".format(e.msg))
