@@ -6,31 +6,34 @@ class PrimaryAuthor:
     def register(self, fname, lname, email, address):
         return
 
-    def status(self):
-
-        print "Welcome back!"
-        
+    def greeting(self):
+        # Retrieve basic information
         query = "SELECT FirstName, LastName, MailingAddress FROM PrimaryAuthor WHERE PrimaryAuthorId = %d;" % self.id
 
         # initialize a cursor and query db
         cursor = self.con.cursor()
         cursor.execute(query)
+        info = cursor.fetchone()
 
-        for row in cursor:
-            print("".join(["{:<12}".format(col) for col in row]))
+        fullName = "%s %s" % (info[0], info[1])
+        mailingAddress = info[2]
+
+        print "Welcome back, %s!" % fullName
+        print "Your mailing address is %s\n" % mailingAddress
 
         cursor.close()
 
-        query = "SELECT COUNT(*) as `Number`, Status FROM Manuscript WHERE PrimaryAuthorId = %d GROUP BY Status;" % self.id
+    def status(self):
+        # Retrieve manuscript status counts
+        query = "SELECT Status, COUNT(*) as `Number` FROM Manuscript WHERE PrimaryAuthorId = %d GROUP BY Status;" % self.id
 
-        # initialize a cursor
+        # initialize a cursor and query db
         cursor = self.con.cursor()
-
-        # query db
         cursor.execute(query)
 
+        print "Manuscripts:"
         for row in cursor:
-            print("".join(["{:<12}".format(col) for col in row]))
+            print("".join(["{}: {}".format(col) for col in row]))
 
         cursor.close()
 

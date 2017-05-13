@@ -14,7 +14,7 @@ from reviewer import Reviewer
 from author import PrimaryAuthor
 
 
-SERVER   = "sunapee.cs.dartmouth.edu"        # db server to connect to
+SERVER = "sunapee.cs.dartmouth.edu"        # db server to connect to
 USERNAME = "hwilson"                            # user to connect as
 PASSWORD = "Password1"                            # user's password
 DATABASE = "hwilson2_db"                              # db to user
@@ -62,6 +62,7 @@ if __name__ == "__main__":
 
           if command == 'login':
             user = login(input)
+            user.greeting()
             user.status()
           elif command == 'status':
             user.status()
