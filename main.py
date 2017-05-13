@@ -14,12 +14,7 @@ import shlex                                 # for parsing
 from editor import Editor
 from reviewer import Reviewer
 from author import PrimaryAuthor
-
-
-SERVER = "sunapee.cs.dartmouth.edu"        # db server to connect to
-USERNAME = "devina"                            # user to connect as
-PASSWORD = "Devina.Kumar"                            # user's password
-DATABASE = "devina_db"                              # db to user
+import config
 
 user = None
 
@@ -171,7 +166,7 @@ def registerAuthor(con, fname, lname, email, address):
 if __name__ == "__main__":
    try:
       # initialize db connection
-      con = mysql.connector.connect(host=SERVER,user=USERNAME,password=PASSWORD,database=DATABASE)
+      con = mysql.connector.connect(host=config.SERVER,user=config.USERNAME,password=config.PASSWORD,database=config.DATABASE)
 
       running = True
       while running:
