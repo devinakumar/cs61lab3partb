@@ -64,6 +64,7 @@ def register(input, con):
                 print("Please make sure that you have inputted values for first and last names.\nPlease follow this format: register editor FirstName LastName")
                 return
         elif userType == "Reviewer":
+            registerReviewer(con, input)
             return
         elif userType == "PrimaryAuthor":
             if len(input) == 6 and input[2] is not None and input[3] is not None and input[4] is not None and input[5] is not None:
@@ -84,6 +85,7 @@ def registerEditor(con, fname, lname):
         try:
             cursor.execute(query)
             con.commit()
+            print(cursor.lastrowid)
         # print("herere")
         except(ValueError,IndexError, NameError):
             print("could not register editor")
@@ -92,6 +94,33 @@ def registerEditor(con, fname, lname):
 
     except(ValueError,IndexError, NameError):
       print("User does not exist")
+
+def registerReviewer(con, input):
+    print("in register reviewer beginning")
+    fname = input[2]
+    lname = input[3]
+    email = input[4]
+    affiliation = input[5]
+    retired = 0
+    try:
+        query = "INSERT INTO Reviewer (FirstName, LastName, Email, Affiliation, Retired) VALUES ('%s', '%s', '%s', '%s', '%s')" % (fname,lname, email, affiliation, retired)
+
+        # initialize a cursor and query db
+        cursor = con.cursor()
+        try:
+            cursor.execute(query)
+            con.commit()
+
+            # print("herere")
+        except(ValueError,IndexError, NameError):
+            print("EXCEPT IN REGISTER AUTHOR")
+            con.rollback()
+        cursor.close()
+
+    # except(ValueError,IndexError, NameError):
+    #   print("User does not exist")
+    except TypeError, e:
+        print(e)
 
 def registerAuthor(con, fname, lname, email, address):
     print("in register author beginning")
