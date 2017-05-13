@@ -18,33 +18,35 @@ import config
 
 user = None
 
+
 def login(input):
-  try:
-    userType = input[1].capitalize()
-    userId = int(input[2])
+    try:
+        userType = input[1].capitalize()
+        userId = int(input[2])
 
-    if userType == "Author":
-      userType = "PrimaryAuthor"
+        if userType == "Author":
+            userType = "PrimaryAuthor"
 
-    query = "SELECT COUNT(*) FROM %s WHERE %sId = %d" % (userType,userType,userId)
+        query = "SELECT COUNT(*) FROM %s WHERE %sId = %d" % (userType, userType, userId)
 
-    # initialize a cursor
-    cursor = con.cursor()
+        # initialize a cursor
+        cursor = con.cursor()
 
-    # query db
-    cursor.execute(query)
-    result = cursor.fetchone()
+        # query db
+        cursor.execute(query)
+        result = cursor.fetchone()
 
-    if result[0] == 1:
-      if userType == "Editor":
-        return Editor(userId, con)
-      elif userType == "Reviewer":
-        return Reviewer(userId, con)
-      elif userType == "PrimaryAuthor":
-        return PrimaryAuthor(userId, con)
-    cursor.close()
-  except (ValueError,IndexError):
-    print ("User does not exist")
+        if result[0] == 1:
+            if userType == "Editor":
+                return Editor(userId, con)
+            elif userType == "Reviewer":
+                return Reviewer(userId, con)
+            elif userType == "PrimaryAuthor":
+                return PrimaryAuthor(userId, con)
+        cursor.close()
+    except (ValueError, IndexError):
+        print ("User does not exist")
+
 
 def register(input, con):
     try:
@@ -67,13 +69,14 @@ def register(input, con):
             else:
                 print("Please register a new author using the following format:\n register author FirstName LastName Email \"MailingAddress\" [Affiliation]")
     # cursor.close()
-    except(ValueError,IndexError, NameError):
+    except(ValueError, IndexError, NameError):
         print("whoops")
     print("end")
 
+
 def registerEditor(con, fname, lname):
     try:
-        query = "INSERT INTO Editor (FirstName, LastName) VALUES ('%s', '%s')" % (fname,lname)
+        query = "INSERT INTO Editor (FirstName, LastName) VALUES ('%s', '%s')" % (fname, lname)
 
         # initialize a cursor and query db
         cursor = con.cursor()
@@ -81,13 +84,14 @@ def registerEditor(con, fname, lname):
             cursor.execute(query)
             con.commit()
         # print("herere")
-        except(ValueError,IndexError, NameError):
+        except(ValueError, IndexError, NameError):
             print("could not register editor")
             con.rollback()
         cursor.close()
 
-    except(ValueError,IndexError, NameError):
-      print("User does not exist")
+    except(ValueError, IndexError, NameError):
+        print("User does not exist")
+
 
 def registerReviewer(con, input):
     print("in register reviewer beginning")
@@ -102,7 +106,7 @@ def registerReviewer(con, input):
         print("Please register a reviewer with the following format:\nregister reviewer FirstName LastName Email Affiliation RICode [RICode] [RICode]")
 
     try:
-        query = "INSERT INTO Reviewer (FirstName, LastName, Email, Affiliation, Retired) VALUES ('%s', '%s', '%s', '%s', '%s')" % (fname,lname, email, affiliation, retired)
+        query = "INSERT INTO Reviewer (FirstName, LastName, Email, Affiliation, Retired) VALUES ('%s', '%s', '%s', '%s', '%s')" % (fname, lname, email, affiliation, retired)
 
         # initialize a cursor and query db
         cursor = con.cursor()
@@ -112,7 +116,7 @@ def registerReviewer(con, input):
             reviewerID = cursor.lastrowid
             for x in range(0, riCodes):
                 print(x)
-                registerReviewerInterest(con, int(reviewerID), int(input[6+x]))
+                registerReviewerInterest(con, int(reviewerID), int(input[6 + x]))
             # print(cursor.lastrowid)
             # print("herere")
         except IndexError, e:
@@ -125,6 +129,7 @@ def registerReviewer(con, input):
     #   print("User does not exist")
     except TypeError, e:
         print(e)
+
 
 def registerReviewerInterest(con, reviewerID, ri):
     query = "INSERT INTO ReviewerInterests (RICode, ReviewerId) VALUES (%d, %d)" % (ri, reviewerID)
@@ -144,7 +149,7 @@ def registerAuthor(con, fname, lname, email, address):
     print(fname, lname, email, address)
     # affiliation = None
     try:
-        query = "INSERT INTO PrimaryAuthor (FirstName, LastName, Email, MailingAddress) VALUES ('%s', '%s', '%s', '%s')" % (fname,lname, email, address)
+        query = "INSERT INTO PrimaryAuthor (FirstName, LastName, Email, MailingAddress) VALUES ('%s', '%s', '%s', '%s')" % (fname, lname, email, address)
 
         # initialize a cursor and query db
         cursor = con.cursor()
@@ -164,47 +169,56 @@ def registerAuthor(con, fname, lname, email, address):
 
 
 if __name__ == "__main__":
-   try:
-      # initialize db connection
-      con = mysql.connector.connect(host=config.SERVER,user=config.USERNAME,password=config.PASSWORD,database=config.DATABASE)
+    try:
+        # initialize db connection
+        con = mysql.connector.connect(host=config.SERVER, user=config.USERNAME, password=config.PASSWORD, database=config.DATABASE)
 
-      running = True
-      while running:
-        try:
-          input = shlex.split(raw_input('> '))
-          command = input[0]
-          print(input)
+        running = True
+        while running:
+            try:
+                input = shlex.split(raw_input('> '))
+                command = input[0]
+                print(input)
 
-          if command == 'login':
-            user = login(input)
-            user.greeting()
-            user.status()
-          elif command == 'status':
-            user.status()
-          elif command == 'register':
-            register(input, con)
-          elif command == 'list':
-            user.list()
-          elif command == 'assign':
-            user.assign(int(input[1]), int(input[2]))
-          elif command == 'submit':
-            print(type(user))
-            if isinstance(user, PrimaryAuthor):
-              user.submit(input)
-            else:
-              print("Only authors may submit manuscripts.")
-          elif command == 'quit':
-            running = False
+                if command == 'login':
+                    user = login(input)
+                    user.greeting()
+                    user.status()
+                elif command == 'status':
+                    user.status()
+                elif command == 'register':
+                    register(input, con)
+                elif command == 'list':
+                    user.list()
+                elif command == 'assign':
+                    if isinstance(user, Editor):
+                        user.assign(int(input[1]), int(input[2]))
+                    else:
+                        print("Only editors may assign manuscripts to reviewers.")
+                elif command == 'submit':
+                    print(type(user))
+                    if isinstance(user, PrimaryAuthor):
+                        user.submit(input)
+                    else:
+                        print("Only authors may submit manuscripts.")
+                elif command == 'reject':
+                    print(type(user))
+                    if isinstance(user, Editor):
+                        user.reject(int(input[1]))
+                    else:
+                        print("Only editors may reject manuscripts.")
+                elif command == 'quit':
+                    running = False
 
-        except mysql.connector.Error as e:        # catch SQL errors
-            print("SQL Error: {0}".format(e.msg))
-   except:                                   # anything else
-      print("Unexpected error: {0}".format(sys.exc_info()[0]))
+            except mysql.connector.Error as e:        # catch SQL errors
+                print("SQL Error: {0}".format(e.msg))
+    except:                                   # anything else
+        print("Unexpected error: {0}".format(sys.exc_info()[0]))
 
-   # cleanup
-   try:
-    con.close()
-   except NameError:
-    pass
+    # cleanup
+    try:
+        con.close()
+    except NameError:
+        pass
 
-   print("\nConnection terminated.", end='')
+    print("\nConnection terminated.", end='')

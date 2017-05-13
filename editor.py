@@ -58,6 +58,20 @@ class Editor:
         cursor.close()
 
     def assign(self, manuscriptId, reviewerId):
+        # print("beginning of assign")
+
+        # check if editor is assigned to manuscript
+        query6 = "SELECT EditorId FROM Manuscript WHERE ManuscriptId = %d" % (manuscriptId)
+        cursor6 = self.con.cursor(buffered=True)
+        cursor6.execute(query6)
+        resultEditor = cursor6.fetchone()
+        if resultEditor[0] != self.id:
+            print("Sorry, but you do not have the authority to assign reviewers for this manuscript.")
+            cursor6.close()
+            return
+        cursor6.close()
+        # print("first cursor done")
+
         # check if reviewer is retired
         query = "SELECT Retired FROM Reviewer WHERE ReviewerId = %d" % (reviewerId)
         cursor = self.con.cursor(buffered=True)
@@ -68,7 +82,8 @@ class Editor:
             cursor.close()
             return
         cursor.close()
-        print("first stage of assign done")
+        # print("second cursor done")
+        # print("first stage of assign done")
 
         # check if manuscript RI and reviewer RI match
         query5 = "SELECT RICode FROM ReviewerInterests WHERE ReviewerId = %d" % (reviewerId)
@@ -76,7 +91,7 @@ class Editor:
         cursor5.execute(query5)
         resultRI = cursor5.fetchone()
         cursor5.close()
-
+        # print("third cursor done")
         query2 = "SELECT RICode FROM Manuscript WHERE ManuscriptId = %d" % (manuscriptId)
         cursor2 = self.con.cursor(buffered=True)
         cursor2.execute(query2)
@@ -104,6 +119,36 @@ class Editor:
         return
 
     def reject(self, manuscriptId):
+        # check if editor is assigned to manuscript
+        query = "SELECT EditorId FROM Manuscript WHERE ManuscriptId = %d" % (manuscriptId)
+        cursor = self.con.cursor(buffered=True)
+        cursor.execute(query)
+        resultEditor = cursor.fetchone()
+        if resultEditor[0] != self.id:
+            print("Sorry, but you do not have the authority to reject this manuscript.")
+            cursor.close()
+            return
+        cursor.close()
+
+        # check if manuscript is in appropriate stage to be rejected
+        query2 = "SELECT Status FROM Manuscript WHERE ManuscriptId = %d" % (manuscriptId)
+        cursor2 = self.con.cursor(buffered=True)
+        cursor2.execute(query2)
+        resultManuscript = cursor2.fetchone()
+        if resultManuscript[0] not in ('Under Review', 'Received'):
+            print("Sorry, but it is too late to reject this manuscript.")
+            cursor2.close()
+            return
+        cursor2.close()
+
+        # take the timestamp and reject the manuscript
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        query3 = "UPDATE Manuscript SET Status='%s', DateAcceptReject='%s' WHERE ManuscriptId=%d" % ('Rejected', timestamp, manuscriptId)
+        cursor3 = self.con.cursor(buffered=True)
+        cursor3.execute(query3)
+        self.con.commit()
+        cursor3.close()
+
         return
 
     def accept(self, manuscriptId):
