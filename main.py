@@ -17,9 +17,9 @@ from author import PrimaryAuthor
 
 
 SERVER = "sunapee.cs.dartmouth.edu"        # db server to connect to
-USERNAME = "hwilson"                            # user to connect as
-PASSWORD = "Password1"                            # user's password
-DATABASE = "hwilson2_db"                              # db to user
+USERNAME = "devina"                            # user to connect as
+PASSWORD = "Devina.Kumar"                            # user's password
+DATABASE = "devina_db"                              # db to user
 
 user = None
 
@@ -70,7 +70,7 @@ def register(input, con):
             if len(input) == 6 and input[2] is not None and input[3] is not None and input[4] is not None and input[5] is not None:
                 registerAuthor(con, input[2], input[3], input[4], input[5])
             else:
-                print("Please register a new author using the following format:\n register author FirstName LastName Email MailingAddress [Affiliation]")
+                print("Please register a new author using the following format:\n register author FirstName LastName Email \"MailingAddress\" [Affiliation]")
     # cursor.close()
     except(ValueError,IndexError, NameError):
         print("whoops")
@@ -147,9 +147,9 @@ def registerReviewerInterest(con, reviewerID, ri):
 def registerAuthor(con, fname, lname, email, address):
     print("in register author beginning")
     print(fname, lname, email, address)
-    affiliation = ''
+    # affiliation = None
     try:
-        query = "INSERT INTO PrimaryAuthor (FirstName, LastName, Email, MailingAddress, Affiliation) VALUES ('%s', '%s', '%s', '%s', '%s')" % (fname,lname, email, address, affiliation)
+        query = "INSERT INTO PrimaryAuthor (FirstName, LastName, Email, MailingAddress) VALUES ('%s', '%s', '%s', '%s')" % (fname,lname, email, address)
 
         # initialize a cursor and query db
         cursor = con.cursor()
