@@ -138,7 +138,7 @@ def registerReviewerInterest(con, reviewerID, ri):
         cursor.execute(query)
         con.commit()
         print("registering reviewer interests")
-    except(ValueError,IndexError, NameError):
+    except(ValueError, IndexError, NameError):
         print("EXCEPT IN REGISTER REVIEWER INTEREST")
         con.rollback()
     cursor.close()
@@ -157,7 +157,7 @@ def registerAuthor(con, fname, lname, email, address):
             cursor.execute(query)
             con.commit()
             # print("herere")
-        except(ValueError,IndexError, NameError):
+        except(ValueError, IndexError, NameError):
             print("EXCEPT IN REGISTER AUTHOR")
             con.rollback()
         cursor.close()
@@ -187,10 +187,15 @@ if __name__ == "__main__":
           elif command == 'status':
             user.status()
           elif command == 'register':
-            print("here in main register")
             register(input, con)
           elif command == 'list':
             user.list()
+          elif command == 'submit':
+            print(type(user))
+            if isinstance(user, PrimaryAuthor):
+              user.submit(input)
+            else:
+              print("Only authors may submit manuscripts.")
 
         except mysql.connector.Error as e:        # catch SQL errors
             print("SQL Error: {0}".format(e.msg))

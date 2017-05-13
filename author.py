@@ -60,7 +60,23 @@ class PrimaryAuthor:
 
         cursor.close()
 
-    def submit(self, title, affiliation, ri, secondaryAuths, filename):
+    def submit(self,input):
+        try:
+            if (len(input) < 5):
+                raise ValueError('')
+            title = input[1]
+            affiliation = input[2]
+            RICode = input[3]
+            secondaryAuthors = input[4:-1]  # index 3 through 2nd to last
+            filename = input[-1]
+            self.submitHelper(title, affiliation, RICode, secondaryAuthors, filename)
+        except (ValueError, IndexError):
+            print ("Invalid. Usage: submit <title> <Affiliation> <RICode> <author2> <author3> <author4> <filename>")
+
+    def submitHelper(self, title, affiliation, ri, secondaryAuths, filename):
+        print("Title: %s, Affiliation: %s, RICode: %s, Filename: %s" % (title, affiliation, ri, filename))
+        for author in secondaryAuths:
+            print("SecondaryAuthor: %s" % author)
         return
 
     def retract(self, manuscriptId):
