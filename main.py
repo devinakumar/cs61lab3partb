@@ -196,6 +196,8 @@ if __name__ == "__main__":
               user.submit(input)
             else:
               print("Only authors may submit manuscripts.")
+          elif command == 'quit':
+            running = False
 
         except mysql.connector.Error as e:        # catch SQL errors
             print("SQL Error: {0}".format(e.msg))
