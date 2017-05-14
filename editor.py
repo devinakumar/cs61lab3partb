@@ -61,7 +61,7 @@ class Editor:
         # print("beginning of assign")
 
         # check if editor is assigned to manuscript
-        query6 = "SELECT EditorId FROM Manuscript WHERE ManuscriptId = %d" % (manuscriptId)
+        query6 = "SELECT EditorId FROM Manuscript WHERE ManuscriptId = %d;" % (manuscriptId)
         cursor6 = self.con.cursor(buffered=True)
         cursor6.execute(query6)
         resultEditor = cursor6.fetchone()
@@ -73,7 +73,7 @@ class Editor:
         # print("first cursor done")
 
         # check if reviewer is retired
-        query = "SELECT Retired FROM Reviewer WHERE ReviewerId = %d" % (reviewerId)
+        query = "SELECT Retired FROM Reviewer WHERE ReviewerId = %d;" % (reviewerId)
         cursor = self.con.cursor(buffered=True)
         cursor.execute(query)
         resultReviewer = cursor.fetchone()
@@ -86,13 +86,13 @@ class Editor:
         # print("first stage of assign done")
 
         # check if manuscript RI and reviewer RI match
-        query5 = "SELECT RICode FROM ReviewerInterests WHERE ReviewerId = %d" % (reviewerId)
+        query5 = "SELECT RICode FROM ReviewerInterests WHERE ReviewerId = %d;" % (reviewerId)
         cursor5 = self.con.cursor(buffered=True)
         cursor5.execute(query5)
         resultRI = cursor5.fetchone()
         cursor5.close()
         # print("third cursor done")
-        query2 = "SELECT RICode FROM Manuscript WHERE ManuscriptId = %d" % (manuscriptId)
+        query2 = "SELECT RICode FROM Manuscript WHERE ManuscriptId = %d;" % (manuscriptId)
         cursor2 = self.con.cursor(buffered=True)
         cursor2.execute(query2)
         resultManuscript = cursor2.fetchone()
@@ -104,7 +104,7 @@ class Editor:
 
         # if they match, assign a manuscript by creating a review assigned to the reviewer with a timestamp
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        query3 = "INSERT INTO Review (ManuscriptId, ReviewerId, DateSent) VALUES (%d, %d, '%s')" % (manuscriptId, reviewerId, timestamp)
+        query3 = "INSERT INTO Review (ManuscriptId, ReviewerId, DateSent) VALUES (%d, %d, '%s');" % (manuscriptId, reviewerId, timestamp)
         cursor3 = self.con.cursor(buffered=True)
         cursor3.execute(query3)
         self.con.commit()
@@ -112,7 +112,7 @@ class Editor:
 
         # change manuscript status to Under Review
         cursor4 = self.con.cursor(buffered=True)
-        query4 = "UPDATE Manuscript SET Status='%s' WHERE ManuscriptId=%d" % ('Under Review', manuscriptId)
+        query4 = "UPDATE Manuscript SET Status='%s' WHERE ManuscriptId=%d;" % ('Under Review', manuscriptId)
         cursor4.execute(query4)
         self.con.commit()
         cursor4.close()
@@ -120,7 +120,7 @@ class Editor:
 
     def reject(self, manuscriptId):
         # check if editor is assigned to manuscript
-        query = "SELECT EditorId FROM Manuscript WHERE ManuscriptId = %d" % (manuscriptId)
+        query = "SELECT EditorId FROM Manuscript WHERE ManuscriptId = %d;" % (manuscriptId)
         cursor = self.con.cursor(buffered=True)
         cursor.execute(query)
         resultEditor = cursor.fetchone()
@@ -131,7 +131,7 @@ class Editor:
         cursor.close()
 
         # check if manuscript is in appropriate stage to be rejected
-        query2 = "SELECT Status FROM Manuscript WHERE ManuscriptId = %d" % (manuscriptId)
+        query2 = "SELECT Status FROM Manuscript WHERE ManuscriptId = %d;" % (manuscriptId)
         cursor2 = self.con.cursor(buffered=True)
         cursor2.execute(query2)
         resultManuscript = cursor2.fetchone()
@@ -143,18 +143,86 @@ class Editor:
 
         # take the timestamp and reject the manuscript
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        query3 = "UPDATE Manuscript SET Status='%s', DateAcceptReject='%s' WHERE ManuscriptId=%d" % ('Rejected', timestamp, manuscriptId)
+        query3 = "UPDATE Manuscript SET Status='%s', DateAcceptReject='%s' WHERE ManuscriptId=%d;" % ('Rejected', timestamp, manuscriptId)
         cursor3 = self.con.cursor(buffered=True)
         cursor3.execute(query3)
         self.con.commit()
         cursor3.close()
-
         return
 
     def accept(self, manuscriptId):
+        # check if editor is assigned to manuscript
+        query = "SELECT EditorId FROM Manuscript WHERE ManuscriptId = %d;" % (manuscriptId)
+        cursor = self.con.cursor(buffered=True)
+        cursor.execute(query)
+        resultEditor = cursor.fetchone()
+        if resultEditor[0] != self.id:
+            print("Sorry, but you do not have the authority to reject this manuscript.")
+            cursor.close()
+            return
+        cursor.close()
+        # print("made it past editor checking")
+        # check if manuscript is in appropriate stage to be Accepted
+        query2 = "SELECT Status FROM Manuscript WHERE ManuscriptId = %d;" % (manuscriptId)
+        cursor2 = self.con.cursor(buffered=True)
+        cursor2.execute(query2)
+        resultManuscript = cursor2.fetchone()
+        if resultManuscript[0] not in ('Under Review'):
+            print("Sorry, but this manuscript must be reviewed before it can be accepted.")
+            cursor2.close()
+            return
+        cursor2.close()
+        # print("made it past stage checking")
+        # check if manuscript has enough reviews to be accepted
+        query3 = "SELECT COUNT(*) FROM Review WHERE ManuscriptId = %d AND DateCompleted IS NOT NULL;" % (manuscriptId)
+        cursor3 = self.con.cursor(buffered=True)
+        cursor3.execute(query3)
+        # print(cursor3.fetchone()[0])
+        validReviews = cursor3.fetchone()[0]
+        print(validReviews)
+        # print("this is result reviews:")
+        # print(resultReviews)
+        if validReviews < 3:
+            print("Sorry, but this manuscript must be reviewed by at least 3 reviewers before it can be accepted.")
+            cursor3.close()
+            return
+        cursor3.close()
+        # update status of manuscript
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        query4 = "UPDATE Manuscript SET Status='%s', DateAcceptReject='%s' WHERE ManuscriptId=%d;" % ('Accepted', timestamp, manuscriptId)
+        cursor4 = self.con.cursor(buffered=True)
+        cursor4.execute(query4)
+        self.con.commit()
+        cursor4.close()
         return
 
     def typeset(self, manuscriptId, pp):
+        # check if editor is assigned to manuscript
+        query = "SELECT EditorId FROM Manuscript WHERE ManuscriptId = %d;" % (manuscriptId)
+        cursor = self.con.cursor(buffered=True)
+        cursor.execute(query)
+        resultEditor = cursor.fetchone()
+        if resultEditor[0] != self.id:
+            print("Sorry, but you do not have the authority to typeset this manuscript.")
+            cursor.close()
+            return
+        cursor.close()
+
+        query2 = "SELECT Status FROM Manuscript WHERE ManuscriptId = %d;" % (manuscriptId)
+        cursor2 = self.con.cursor(buffered=True)
+        cursor2.execute(query2)
+        resultManuscript = cursor2.fetchone()
+        if resultManuscript[0] not in ('Accepted'):
+            print("Sorry, but tbis manuscript either must be reviewed, has already been rejected, or has already been typeset.")
+            cursor2.close()
+            return
+        cursor2.close()
+
+        query3 = "UPDATE Manuscript SET Status='%s', PagesOccupied=%d WHERE ManuscriptId=%d;" % ('Typeset', pp, manuscriptId)
+        cursor3 = self.con.cursor(buffered=True)
+        cursor3.execute(query3)
+        self.con.commit()
+        cursor3.close()
         return
 
     def schedule(self, manuscriptId, issue):
