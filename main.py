@@ -26,10 +26,14 @@ def login(input):
         userType = input[1].capitalize()
         userId = int(input[2])
 
+        reviewerText = ""
+
         if userType == "Author":
             userType = "PrimaryAuthor"
+        elif userType == "Reviewer":
+            reviewerText = "AND retired = 0"
 
-        query = "SELECT COUNT(*) FROM %s WHERE %sId = %d;" % (userType, userType, userId)
+        query = "SELECT COUNT(*) FROM %s WHERE %sId = %d %s;" % (userType, userType, userId, reviewerText)
 
         cursor = con.cursor()
         cursor.execute(query)
@@ -43,9 +47,12 @@ def login(input):
                 return Reviewer(userId, con)
             elif userType == "PrimaryAuthor":
                 return PrimaryAuthor(userId, con)
+        else:
+            raise ValueError()
         cursor.close()
     except (ValueError, IndexError):
-        print ("User does not exist")
+        print ("User does not exist or is retired")
+        return None
 
 
 def register(input, con):
@@ -78,14 +85,18 @@ if __name__ == "__main__":
 
                 if command == 'login':
                     user = login(input)
-                    user.greeting()
-                    user.status()
+                    if user is not None:
+                        user.greeting()
+                        user.status()
                 elif command == 'status':
                     user.status()
                 elif command == 'register':
                     register(input, con)
                 elif command == 'list':
-                    user.list()
+                    if user is not None:
+                        user.list()
+                    else:
+                        print("You must login first")
                 elif command == 'assign':
                     if isinstance(user, Editor):
                         user.assign(input)
