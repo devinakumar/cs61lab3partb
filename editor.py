@@ -213,7 +213,7 @@ class Editor:
         cursor2.execute(query2)
         resultManuscript = cursor2.fetchone()
         if resultManuscript[0] not in ('Accepted'):
-            print("Sorry, but tbis manuscript either must be reviewed, has already been rejected, or has already been typeset.")
+            print("Sorry, but this manuscript either must be reviewed, has already been rejected, or has already been typeset.")
             cursor2.close()
             return
         cursor2.close()
@@ -226,6 +226,30 @@ class Editor:
         return
 
     def schedule(self, manuscriptId, issue):
+        # check if editor is assigned to manuscript
+        query = "SELECT EditorId FROM Manuscript WHERE ManuscriptId = %d;" % (manuscriptId)
+        cursor = self.con.cursor(buffered=True)
+        cursor.execute(query)
+        resultEditor = cursor.fetchone()
+        if resultEditor[0] != self.id:
+            print("Sorry, but you do not have the authority to typeset this manuscript.")
+            cursor.close()
+            return
+        cursor.close()
+        # check if manuscript is typeset
+        query2 = "SELECT Status FROM Manuscript WHERE ManuscriptId = %d;" % (manuscriptId)
+        cursor2 = self.con.cursor(buffered=True)
+        cursor2.execute(query2)
+        resultManuscript = cursor2.fetchone()
+        if resultManuscript[0] not in ('Typeset'):
+            print("Sorry, but this manuscript either must be reviewed, has already been rejected, has not been typeset, or has already been published.")
+            cursor2.close()
+            return
+        cursor2.close()
+        # check if issue exists; if yes, then check whether it has been published and if not, then create the issue
+        # add up all of the manuscripts that are already in the issue; if adding this one would exceed 100, then do not add it
+        # if all these checks pass, add the manuscript
+
         return
 
     def publish(self, issue):
