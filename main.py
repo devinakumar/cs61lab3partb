@@ -129,9 +129,10 @@ if __name__ == "__main__":
                 elif command == 'review':
                     # print(type(user))
                     if isinstance(user, Reviewer):
-                        user.review(input[1], int(input[2]), int(input[3]), int(input[4]), int(input[5]), int(input[6]))
+                        # user.review(input[1], int(input[2]), int(input[3]), int(input[4]), int(input[5]), int(input[6]))
+                        user.review(input)
                     else:
-                        print("Only Reviewers may reviewer manuscripts.")
+                        print("Only Reviewers may review manuscripts.")
                 elif command == 'retract':
                     if isinstance(user, PrimaryAuthor):
                         user.retract(input)
