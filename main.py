@@ -137,6 +137,12 @@ if __name__ == "__main__":
                         user.retract(input)
                     else:
                         print("Only authors may retract manuscripts.")
+                elif command == 'logout':
+                    if user is not None:
+                        user = None
+                        print("Logged out")
+                    else:
+                        print("You are not logged in")
                 elif command == 'quit':
                     running = False
             except mysql.connector.Error as e:        # catch SQL errors
