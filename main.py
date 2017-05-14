@@ -16,13 +16,14 @@ from reviewer import Reviewer
 from author import PrimaryAuthor
 import config
 import hashlib
+import getpass
 
 user = None
 
 REGISTER_ERROR = "Invalid. Usage: register [author/reviewer/editor] ..."
 
 
-def login(input):
+def login(input, salt):
     try:
         userType = input[1].capitalize()
         userId = int(input[2])
@@ -36,12 +37,28 @@ def login(input):
 
         query = "SELECT COUNT(*) FROM %s WHERE %sId = %d %s;" % (userType, userType, userId, reviewerText)
 
-        cursor = con.cursor()
+        cursor = con.cursor(buffered=True)
         cursor.execute(query)
 
         result = cursor.fetchone()
+        cursor.close()
 
         if result[0] == 1:
+            # Ask for password
+            password = getpass.getpass()
+            hashedPassword = hashlib.sha512(password + salt).hexdigest()
+            print(hashedPassword)
+
+            # Check password versus database
+            query = "SELECT COUNT(*) FROM Credential WHERE UserId = %d AND UserType = '%s' AND Password = '%s'" % (userId, userType, hashedPassword)
+            cursor = con.cursor(buffered=True)
+            cursor.execute(query)
+            result = cursor.fetchone()
+
+            if result[0] != 1:
+                print("Invalid password")
+                return None
+
             if userType == "Editor":
                 return Editor(userId, con)
             elif userType == "Reviewer":
@@ -54,10 +71,6 @@ def login(input):
     except (ValueError, IndexError):
         print ("User does not exist or is retired")
         return None
-
-
-def hash(password, salt):
-    return hashlib.sha512(password + salt).hexdigest()
 
 
 def register(input, con):
@@ -80,9 +93,10 @@ if __name__ == "__main__":
         # initialize db connection
         con = mysql.connector.connect(host=config.SERVER, user=config.USERNAME, password=config.PASSWORD, database=config.DATABASE)
 
+        salt = getpass.getpass("Please enter master key: ")
         print("Welcome! Connected to the database.")
-
         running = True
+
         while running:
             try:
                 input = shlex.split(raw_input('> '))
@@ -92,7 +106,7 @@ if __name__ == "__main__":
                     if user is not None:
                         print("Please logout first")
                         continue
-                    user = login(input)
+                    user = login(input, salt)
                     if user is not None:
                         user.greeting()
                         user.status()
