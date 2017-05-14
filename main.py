@@ -224,6 +224,11 @@ if __name__ == "__main__":
                         user.schedule(int(input[1]), int(input[2]), input[3])
                     else:
                         print("Only editors may schedule manuscripts.")
+                elif command == 'retract':
+                    if isinstance(user, PrimaryAuthor):
+                        user.retract(input)
+                    else:
+                        print("Only authors may retract manuscripts.")
                 elif command == 'quit':
                     running = False
 

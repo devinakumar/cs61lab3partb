@@ -141,12 +141,57 @@ class PrimaryAuthor:
             try:
                 cursor.execute(query)
                 self.con.commit()
+                cursor.close()
             except IndexError:
                 self.con.rollback()
+                cursor.close()
                 return
         except IndexError:
             print("You did not enter a valid secondary author name")
             return
 
-    def retract(self, manuscriptId):
-        return
+    def retract(self, input):
+        try:
+            manuscriptId = int(input[1])
+        except (IndexError, ValueError):
+            print("Invalid manuscriptId")
+            return
+
+        # Make sure the manuscript exists and is owned by the author
+        query = "SELECT COUNT(*) FROM Manuscript WHERE PrimaryAuthorId = %d AND ManuscriptId = %d;" % (self.id, manuscriptId)
+        cursor = self.con.cursor(buffered=True)
+        cursor.execute(query)
+        result = cursor.fetchone()
+        if result[0] != 1:
+            print("You do not have access to that manuscript, or it does not exist")
+            return
+        cursor.close()
+
+        # Ask them if they are sure
+        response = raw_input("Are you sure? (Yes/No) > ")
+        if response.capitalize() != "Yes":
+            print("OK, we won't delete it")
+            return
+
+        # Delete secondary authors
+        query = "DELETE FROM SecondaryAuthor WHERE ManuscriptId = %d;" % manuscriptId
+        cursor = self.con.cursor(buffered=True)
+        cursor.execute(query)
+        self.con.commit()
+        cursor.close()
+
+        # Delete reviews
+        query = "DELETE FROM Review WHERE ManuscriptId = %d;" % manuscriptId
+        cursor = self.con.cursor(buffered=True)
+        cursor.execute(query)
+        self.con.commit()
+        cursor.close()
+
+        # Delete manuscript
+        query = "DELETE FROM Manuscript WHERE ManuscriptId = %d;" % manuscriptId
+        cursor = self.con.cursor(buffered=True)
+        cursor.execute(query)
+        self.con.commit()
+        cursor.close()
+
+        print("Deleted manuscript")
