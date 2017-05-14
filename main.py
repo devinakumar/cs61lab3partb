@@ -99,13 +99,13 @@ if __name__ == "__main__":
                 elif command == 'reject':
                     # print(type(user))
                     if isinstance(user, Editor):
-                        user.reject(int(input[1]))
+                        user.reject(input)
                     else:
                         print("Only editors may reject manuscripts.")
                 elif command == 'accept':
                     # print(type(user))
                     if isinstance(user, Editor):
-                        user.accept(int(input[1]))
+                        user.accept(input)
                     else:
                         print("Only editors may accept manuscripts.")
                 elif command == 'typeset':
