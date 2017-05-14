@@ -223,6 +223,12 @@ if __name__ == "__main__":
                         user.schedule(int(input[1]), int(input[2]), input[3])
                     else:
                         print("Only editors may schedule manuscripts.")
+                elif command == 'publish':
+                    # print(type(user))
+                    if isinstance(user, Editor):
+                        user.publish(int(input[1]), input[2])
+                    else:
+                        print("Only editors may publish manuscripts.")
                 elif command == 'retract':
                     if isinstance(user, PrimaryAuthor):
                         user.retract(input)

@@ -315,5 +315,55 @@ class Editor:
         cursor7.close()
         return
 
-    def publish(self, issue):
+    def publish(self, year, period):
+        print("in publish")
+        # check if issue has been published
+        query = "SELECT COUNT(*) FROM JournalIssue WHERE Year = %d AND Period = '%s' AND PrintDate IS NOT NULL;" % (year, period)
+        cursor = self.con.cursor(buffered=True)
+        cursor.execute(query)
+        issuePublished = cursor.fetchone()[0]
+        print(issuePublished)
+        if issuePublished >= 1:
+            print("This issue has already been published/set for publication.")
+            cursor.close()
+            return
+        cursor.close()
+
+        # check if issue exists
+        query2 = "SELECT COUNT(*) FROM JournalIssue WHERE Year = %d AND Period = '%s' AND PrintDate IS NULL;" % (year, period)
+        cursor2 = self.con.cursor(buffered=True)
+        cursor2.execute(query2)
+        issueExists = cursor2.fetchone()[0]
+        print(issueExists)
+        if issueExists < 1:
+            print("This issue does not exist.  Please try again.")
+            cursor2.close()
+            return
+        cursor2.close()
+
+        # check that there is at least 1 manuscript assigned
+        query3 = "SELECT COUNT(*) FROM Manuscript WHERE JournalIssueYear = %d AND JournalIssuePeriod = '%s';" % (year, period)
+        cursor3 = self.con.cursor(buffered=True)
+        cursor3.execute(query3)
+        manuscriptNumber = cursor3.fetchone()[0]
+        print(manuscriptNumber)
+        if manuscriptNumber < 1:
+            print("There must be at least 1 manuscript schedule to appear in the issue to publish it.")
+            cursor3.close()
+            return
+        cursor3.close()
+
+        # set the manuscripts and issue to published
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        query4 = "UPDATE Manuscript SET Status = '%s' WHERE JournalIssueYear = %d AND JournalIssuePeriod = '%s';" % ('Published', year, period)
+        cursor4 = self.con.cursor(buffered=True)
+        cursor4.execute(query4)
+        self.con.commit()
+        cursor4.close()
+
+        query5 = "UPDATE JournalIssue SET PrintDate = '%s' WHERE Year = %d AND Period = '%s';" % (timestamp, year, period)
+        cursor5 = self.con.cursor(buffered=True)
+        cursor5.execute(query5)
+        self.con.commit()
+        cursor5.close()
         return
