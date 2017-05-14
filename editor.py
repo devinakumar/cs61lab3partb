@@ -4,6 +4,7 @@ from __future__ import print_function        # make print a function
 from datetime import datetime                # get datetime
 # import mysql.connector                       # mysql functionality
 # import sys                                   # for misc errors
+import auth
 
 CURRENT_YEAR = 2016
 REGISTER_ERROR = "Invalid. Usage: register editor FirstName LastName"
@@ -15,20 +16,28 @@ class Editor:
         self.con = connection
 
     @staticmethod
-    def register(con, input):
+    def register(con, input, salt):
         try:
             if len(input) == 4 and input[2] is not None and input[3] is not None:
                 fname = input[2]
                 lname = input[3]
+
+                password = auth.createPassword(con, salt)
+
+                if not password:
+                    return
 
                 query = "INSERT INTO Editor (FirstName, LastName) VALUES ('%s', '%s')" % (fname, lname)
 
                 # initialize a cursor and query db
                 cursor = con.cursor()
                 cursor.execute(query)
-                con.commit()
 
-                print("Created an editor with ID=%s... you can now login" % cursor.lastrowid)
+                editorId = cursor.lastrowid
+
+                auth.register(con, editorId, 'Editor', password)
+
+                print("Created an editor with ID=%s... you can now login" % editorId)
                 cursor.close()
             else:
                 print(REGISTER_ERROR)

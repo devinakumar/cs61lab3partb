@@ -15,7 +15,7 @@ from editor import Editor
 from reviewer import Reviewer
 from author import PrimaryAuthor
 import config
-import hashlib
+import auth
 import getpass
 
 user = None
@@ -23,7 +23,7 @@ user = None
 REGISTER_ERROR = "Invalid. Usage: register [author/reviewer/editor] ..."
 
 
-def login(input, salt):
+def login(con, input, salt):
     try:
         userType = input[1].capitalize()
         userId = int(input[2])
@@ -44,21 +44,11 @@ def login(input, salt):
         cursor.close()
 
         if result[0] == 1:
-            # Ask for password
-            password = getpass.getpass()
-            hashedPassword = hashlib.sha512(password + salt).hexdigest()
-            print(hashedPassword)
-
-            # Check password versus database
-            query = "SELECT COUNT(*) FROM Credential WHERE UserId = %d AND UserType = '%s' AND Password = '%s'" % (userId, userType, hashedPassword)
-            cursor = con.cursor(buffered=True)
-            cursor.execute(query)
-            result = cursor.fetchone()
-
-            if result[0] != 1:
+            if not auth.checkPassword(con, userId, userType, salt):
                 print("Invalid password")
-                return None
+                return
 
+            # Determine user type and create the relevant object
             if userType == "Editor":
                 return Editor(userId, con)
             elif userType == "Reviewer":
@@ -73,17 +63,22 @@ def login(input, salt):
         return None
 
 
-def register(input, con):
+def register(con, input, salt):
     try:
         userType = input[1].capitalize()
+
+        if userType == "Author":
+            userType = "PrimaryAuthor"
+
         if userType == "Editor":
-            Editor.register(con, input)
+            Editor.register(con, input, salt)
         elif userType == "Reviewer":
-            Reviewer.register(con, input)
-        elif userType == "Author":
-            PrimaryAuthor.register(con, input)
+            Reviewer.register(con, input, salt)
+        elif userType == "PrimaryAuthor":
+            PrimaryAuthor.register(con, input, salt)
         else:
             raise ValueError()
+
     except(ValueError, IndexError, NameError, TypeError):
         print(REGISTER_ERROR)
 
@@ -106,14 +101,14 @@ if __name__ == "__main__":
                     if user is not None:
                         print("Please logout first")
                         continue
-                    user = login(input, salt)
+                    user = login(con, input, salt)
                     if user is not None:
                         user.greeting()
                         user.status()
                 elif command == 'status':
                     user.status()
                 elif command == 'register':
-                    register(input, con)
+                    register(con, input, salt)
                 elif command == 'list':
                     if user is not None:
                         user.list()
@@ -188,6 +183,8 @@ if __name__ == "__main__":
             except mysql.connector.Error as e:        # catch SQL errors
                 if "UserException1001" in str(e):
                     print("Either the RICode is invalid, or there are not 3 reviewers interested in it")
+                elif "CONSTRAINT `fk_ReviewerInterests_RICodes" in str(e):
+                    print("RICode is invalid")
                 else:
                     print("Invalid: {0}".format(e.msg))
                 con.rollback()
