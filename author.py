@@ -3,6 +3,7 @@
 from __future__ import print_function        # make print a function
 from datetime import datetime                # get datetime
 import shlex                                 # for parsing
+import auth
 # import mysql.connector                       # mysql functionality
 # import sys                                   # for misc errors
 
@@ -15,7 +16,7 @@ class PrimaryAuthor:
         self.con = connection
 
     @staticmethod
-    def register(con, input):
+    def register(con, input, salt):
         try:
             if len(input) == 6 and input[2] is not None and input[3] is not None and input[4] is not None and input[5] is not None:
                 fname = input[2]
@@ -23,14 +24,22 @@ class PrimaryAuthor:
                 email = input[4]
                 address = input[5]
 
+                password = auth.createPassword(con, salt)
+
+                if not password:
+                    return
+
                 query = "INSERT INTO PrimaryAuthor (FirstName, LastName, Email, MailingAddress) VALUES ('%s', '%s', '%s', '%s')" % (fname, lname, email, address)
-                cursor = con.cursor()
+                cursor = con.cursor(buffered=True)
                 cursor.execute(query)
-                con.commit()
-                print("Created an author with ID=%s... you can now login" % cursor.lastrowid)
+                authorId = cursor.lastrowid
                 cursor.close()
+
+                auth.register(con, authorId, 'PrimaryAuthor', password)
+
+                print("Created an author with ID=%s... you can now login" % authorId)
             else:
-                print(REGISTER_AUTHOR_ERROR)
+                print(REGISTER_ERROR)
         except (ValueError, IndexError, NameError, TypeError):
             print(REGISTER_ERROR)
 

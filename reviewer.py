@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 
 from __future__ import print_function        # make print a function
-import mysql.connector                       # mysql functionality
-import sys                                   # for misc errors
+# import mysql.connector                       # mysql functionality
+# import sys                                   # for misc errors
 from datetime import datetime                # get datetime
+import auth
 
 REGISTER_ERROR = "Invalid. Usage: register reviewer FirstName LastName Email Affiliation RICode [RICode] [RICode]"
 
@@ -14,7 +15,7 @@ class Reviewer:
         self.con = connection
 
     @staticmethod
-    def register(con, input):
+    def register(con, input, salt):
         try:
             riCodes = len(input) - 6
             if len(input) >= 7 and len(input) <= 9:
@@ -26,6 +27,11 @@ class Reviewer:
             else:
                 raise ValueError()
 
+            password = auth.createPassword(con, salt)
+
+            if not password:
+                return
+
             query = "INSERT INTO Reviewer (FirstName, LastName, Email, Affiliation, Retired) VALUES ('%s', '%s', '%s', '%s', '%s')" % (fname, lname, email, affiliation, retired)
 
             # initialize a cursor and query db
@@ -33,10 +39,12 @@ class Reviewer:
             cursor.execute(query)
 
             reviewerID = cursor.lastrowid
+
             for x in range(0, riCodes):
                 Reviewer.insertReviewerInterest(con, int(reviewerID), int(input[6 + x]))
 
-            con.commit()
+            auth.register(con, reviewerID, 'Reviewer', password)
+
             print("Created a reviewer with ID=%s... you can now login" % reviewerID)
             cursor.close()
         except (ValueError, NameError, IndexError, TypeError):
