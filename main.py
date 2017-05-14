@@ -138,7 +138,7 @@ if __name__ == "__main__":
                         user.resign()
                         user = None
                     else:
-                      print("Only reviewers may resign electronically.")
+                        print("Only reviewers may resign electronically.")
                 elif command == 'retract':
                     if isinstance(user, PrimaryAuthor):
                         user.retract(input)
