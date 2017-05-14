@@ -123,7 +123,7 @@ if __name__ == "__main__":
                 elif command == 'publish':
                     # print(type(user))
                     if isinstance(user, Editor):
-                        user.publish(int(input[1]), input[2])
+                        user.publish(input)
                     else:
                         print("Only editors may publish manuscripts.")
                 elif command == 'review':

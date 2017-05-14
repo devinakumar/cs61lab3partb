@@ -365,7 +365,7 @@ class Editor:
         except (ValueError, IndexError, TypeError, NameError):
             print("Invalid. Usage: schedule manuscriptId year period(1-4)")
 
-    def publish(self, year, period):
+    def publish(self, input):
         try:
             year = int(input[1])
             period = input[2]
