@@ -1,5 +1,6 @@
 ## CS 61 Lab 2, Part 5
-### Author functionality:
+### Functionalities
+#### Author functionality:
 
 
 REGISTER: A user may register an author using the following command:
@@ -41,7 +42,7 @@ RETRACT: This command allows authors to retract a manuscript from the system. Th
 ```retract [manuscriptID]```
 
 
-### Editor functionality:
+#### Editor functionality:
 
 
 REGISTER: A user may register an editor using the following command:
@@ -106,7 +107,7 @@ PUBLISH: This command publishes an issue and sets the status of all its manuscri
 ```publish [manuscriptID]```
 
 
-### Reviewer functionality:
+#### Reviewer functionality:
 
 
 REGISTER: This command registers a reviewer.  We collect information about a reviewer's affiliation and email because this is one of the only opportunities to do so.  This command also assumed that users are not retired upon registration.  A user may register a reviewer using the following command:
@@ -148,6 +149,7 @@ REVIEW: This command allows a reviewer to submit a review about a specific manus
 ```review [recommendation] [manuscriptID] [appropriateness] [clarity] [methodology] [contributionToField]```
 
 
+### Testing
 
 
 
