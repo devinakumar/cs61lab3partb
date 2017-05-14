@@ -37,7 +37,7 @@ class Reviewer:
                 Reviewer.insertReviewerInterest(con, int(reviewerID), int(input[6 + x]))
 
             con.commit()
-            print("Created a reviewer with ID=%s" % reviewerID)
+            print("Created a reviewer with ID=%s... you can now login" % reviewerID)
             cursor.close()
         except (ValueError, NameError, IndexError, TypeError):
             print(REGISTER_ERROR)
