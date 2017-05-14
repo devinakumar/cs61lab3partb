@@ -213,6 +213,12 @@ if __name__ == "__main__":
                         user.accept(int(input[1]))
                     else:
                         print("Only editors may accept manuscripts.")
+                elif command == 'typeset':
+                    # print(type(user))
+                    if isinstance(user, Editor):
+                        user.typeset(int(input[1]), int(input[2]))
+                    else:
+                        print("Only editors may typeset manuscripts.")
                 elif command == 'quit':
                     running = False
 

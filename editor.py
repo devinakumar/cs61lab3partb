@@ -197,6 +197,32 @@ class Editor:
         return
 
     def typeset(self, manuscriptId, pp):
+        # check if editor is assigned to manuscript
+        query = "SELECT EditorId FROM Manuscript WHERE ManuscriptId = %d;" % (manuscriptId)
+        cursor = self.con.cursor(buffered=True)
+        cursor.execute(query)
+        resultEditor = cursor.fetchone()
+        if resultEditor[0] != self.id:
+            print("Sorry, but you do not have the authority to typeset this manuscript.")
+            cursor.close()
+            return
+        cursor.close()
+
+        query2 = "SELECT Status FROM Manuscript WHERE ManuscriptId = %d;" % (manuscriptId)
+        cursor2 = self.con.cursor(buffered=True)
+        cursor2.execute(query2)
+        resultManuscript = cursor2.fetchone()
+        if resultManuscript[0] not in ('Accepted'):
+            print("Sorry, but tbis manuscript either must be reviewed, has already been rejected, or has already been typeset.")
+            cursor2.close()
+            return
+        cursor2.close()
+
+        query3 = "UPDATE Manuscript SET Status='%s', PagesOccupied=%d WHERE ManuscriptId=%d;" % ('Typeset', pp, manuscriptId)
+        cursor3 = self.con.cursor(buffered=True)
+        cursor3.execute(query3)
+        self.con.commit()
+        cursor3.close()
         return
 
     def schedule(self, manuscriptId, issue):
