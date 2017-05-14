@@ -31,11 +31,9 @@ def login(input):
 
         query = "SELECT COUNT(*) FROM %s WHERE %sId = %d;" % (userType, userType, userId)
 
-        # initialize a cursor
         cursor = con.cursor()
-
-        # query db
         cursor.execute(query)
+
         result = cursor.fetchone()
 
         if result[0] == 1:
@@ -70,13 +68,13 @@ if __name__ == "__main__":
         # initialize db connection
         con = mysql.connector.connect(host=config.SERVER, user=config.USERNAME, password=config.PASSWORD, database=config.DATABASE)
 
+        print("Welcome! Connected to the database.")
+
         running = True
         while running:
             try:
                 input = shlex.split(raw_input('> '))
                 command = input[0]
-
-                # print(command)
 
                 if command == 'login':
                     user = login(input)
@@ -141,12 +139,12 @@ if __name__ == "__main__":
                         print("Only authors may retract manuscripts.")
                 elif command == 'quit':
                     running = False
-
-                # reset db connection
-                con = mysql.connector.connect(host=config.SERVER, user=config.USERNAME, password=config.PASSWORD, database=config.DATABASE)
             except mysql.connector.Error as e:        # catch SQL errors
+                if "UserException1001" in str(e):
+                    print("Either the RICode is invalid, or there are not 3 reviewers interested in it")
+                else:
+                    print("Invalid: {0}".format(e.msg))
                 con.rollback()
-                print("Invalid: {0}".format(e.msg))
     except:                                   # anything else
         print("Unexpected error: {0}".format(sys.exc_info()[0]))
 

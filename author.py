@@ -3,7 +3,7 @@
 from __future__ import print_function        # make print a function
 from datetime import datetime                # get datetime
 import shlex                                 # for parsing
-import mysql.connector                       # mysql functionality
+# import mysql.connector                       # mysql functionality
 # import sys                                   # for misc errors
 
 REGISTER_ERROR = "Invalid. Usage: register author FirstName LastName Email \"MailingAddress\""
@@ -104,13 +104,7 @@ class PrimaryAuthor:
 
         # initialize a cursor and query db
         authorCursor = self.con.cursor(buffered=True)
-        try:
-            authorCursor.execute(query)
-            self.con.commit()
-        except IndexError, e:
-            print(e)
-            self.con.rollback()
-            return
+        authorCursor.execute(query)
         authorCursor.close()
 
         # Now we need to perform the insert and return the manuscript ID
@@ -128,23 +122,15 @@ class PrimaryAuthor:
         query = "INSERT INTO Manuscript (Title, DateReceived, Status, RICode, PrimaryAuthorID, EditorID, PrimaryAuthorAffiliation, Document) VALUES ('%s', '%s', '%s', %d, %d, %d, '%s', '%s');" % (title, date, status, ri, self.id, editorID, affiliation, filename)
 
         cursor = self.con.cursor(buffered=True)
-        try:
-            cursor.execute(query)
-            self.con.commit()
-            manuscriptID = cursor.lastrowid
-        except (IndexError, mysql.connector.Error) as e:
-            if "UserException1001" in str(e):
-                print("Either the RICode is invalid, or there are not 3 reviewers interested in it")
-            else:
-                print(e)
-            self.con.rollback()
-            return
+        cursor.execute(query)
+        manuscriptID = cursor.lastrowid
 
         # insert secondary authors
         for index, author in enumerate(secondaryAuths):
             self.__createSecondaryAuthor(author, index + 1, manuscriptID)
 
         print("Created a manuscript with ID=%s" % manuscriptID)
+        self.con.commit()
         cursor.close()
         editorCursor.close()
 
@@ -157,14 +143,8 @@ class PrimaryAuthor:
             lastName = ' '.join(fullName[1:])
             query = "INSERT INTO SecondaryAuthor (BylinePosition, ManuscriptId, FirstName, LastName) VALUES (%d, %d, '%s', '%s');" % (bylinePosition, manuscriptId, firstName, lastName)
             cursor = self.con.cursor(buffered=True)
-            try:
-                cursor.execute(query)
-                self.con.commit()
-                cursor.close()
-            except IndexError:
-                self.con.rollback()
-                cursor.close()
-                return
+            cursor.execute(query)
+            cursor.close()
         except IndexError:
             print("You did not enter a valid secondary author name")
             return
@@ -196,18 +176,16 @@ class PrimaryAuthor:
         query = "DELETE FROM SecondaryAuthor WHERE ManuscriptId = %d;" % manuscriptId
         cursor = self.con.cursor(buffered=True)
         cursor.execute(query)
-        self.con.commit()
         cursor.close()
 
         # Delete reviews
         query = "DELETE FROM Review WHERE ManuscriptId = %d;" % manuscriptId
         cursor = self.con.cursor(buffered=True)
         cursor.execute(query)
-        self.con.commit()
         cursor.close()
 
         # Delete manuscript
-        query = "DELETE FROM Manuscript WHERE ManuscriptId = %d;" % manuscriptId
+        query = "DELETE FROM Manuscript WHERE PrimaryAuthorId = %d AND ManuscriptId = %d;" % (self.id, manuscriptId)
         cursor = self.con.cursor(buffered=True)
         cursor.execute(query)
         self.con.commit()
