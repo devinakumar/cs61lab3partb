@@ -218,6 +218,12 @@ if __name__ == "__main__":
                         user.typeset(int(input[1]), int(input[2]))
                     else:
                         print("Only editors may typeset manuscripts.")
+                elif command == 'schedule':
+                    # print(type(user))
+                    if isinstance(user, Editor):
+                        user.schedule(int(input[1]), int(input[2]), input[3])
+                    else:
+                        print("Only editors may schedule manuscripts.")
                 elif command == 'quit':
                     running = False
 

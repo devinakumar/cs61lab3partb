@@ -225,7 +225,7 @@ class Editor:
         cursor3.close()
         return
 
-    def schedule(self, manuscriptId, issue):
+    def schedule(self, manuscriptId, year, period):
         # check if editor is assigned to manuscript
         query = "SELECT EditorId FROM Manuscript WHERE ManuscriptId = %d;" % (manuscriptId)
         cursor = self.con.cursor(buffered=True)
@@ -246,7 +246,27 @@ class Editor:
             cursor2.close()
             return
         cursor2.close()
-        # check if issue exists; if yes, then check whether it has been published and if not, then create the issue
+        # check if issue has been published
+        query3 = "SELECT COUNT(*) FROM JournalIssue WHERE Year = %d AND Period = '%s' AND PrintDate IS NOT NULL;" % (year, period)
+        cursor3 = self.con.cursor(buffered=True)
+        cursor3.execute(query3)
+        issuePublished = cursor3.fetchone()[0]
+        if issuePublished >= 1:
+            print("This issue has already been published/set for publication.")
+            cursor3.close()
+            return
+        cursor3.close()
+
+        # check if issue exists; if not, then create it
+        query4 = "SELECT COUNT(*) FROM JournalIssue WHERE Year = %d AND Period = '%s' AND PrintDate IS NULL;" % (year, period)
+        cursor4 = self.con.cursor(buffered=True)
+        cursor4.execute(query4)
+        issuePublished = cursor4.fetchone()[0]
+        if issuePublished >= 1:
+            print("This issue has already been published/set for publication.")
+            cursor4.close()
+            return
+        cursor4.close()
         # add up all of the manuscripts that are already in the issue; if adding this one would exceed 100, then do not add it
         # if all these checks pass, add the manuscript
 
