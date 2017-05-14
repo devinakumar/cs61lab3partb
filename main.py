@@ -111,19 +111,19 @@ if __name__ == "__main__":
                 elif command == 'typeset':
                     # print(type(user))
                     if isinstance(user, Editor):
-                        user.typeset(int(input[1]), int(input[2]))
+                        user.typeset(input)
                     else:
                         print("Only editors may typeset manuscripts.")
                 elif command == 'schedule':
                     # print(type(user))
                     if isinstance(user, Editor):
-                        user.schedule(int(input[1]), int(input[2]), input[3])
+                        user.schedule(input)
                     else:
                         print("Only editors may schedule manuscripts.")
                 elif command == 'publish':
                     # print(type(user))
                     if isinstance(user, Editor):
-                        user.publish(int(input[1]), input[2])
+                        user.publish(input)
                     else:
                         print("Only editors may publish manuscripts.")
                 elif command == 'review':
