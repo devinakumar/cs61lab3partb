@@ -59,7 +59,6 @@ LOGIN: A user may login to an editor account using the following command:
 This will also be followed by the output from the "Status" command.
 
 
-
 STATUS: A user may show the status of his or her editor account, which will provide a summary of the number of manuscripts in various phases. Please note that using the "List" command will show specific information about manuscripts with which the editor is associated. An editor may see status using the following command:
 
 
@@ -101,13 +100,52 @@ SCHEDULE: This command sets the status of a manuscript to "Scheduled" and assign
 ```schedule [manuscriptID] [Year] [Period]```
 
 
-PUBLISH: This command publishes an issue and sets the status of all its manuscripts to "Published."  This command ensures that the issue exists, that it has not already been published and that the issue contains at least 1 manuscript.  Then, the command updates the print date (assumed to be the date/time that the publish decision is made because this causes the issue to be sent for publiaiton) and updates the status of all of the manuscripts in the issue to "Published."  An editor may publish an issue with the following command:
+PUBLISH: This command publishes an issue and sets the status of all its manuscripts to "Published."  This command ensures that the issue exists, that it has not already been published and that the issue contains at least 1 manuscript.  Then, the command updates the print date (assumed to be the date/time that the publish decision is made because this causes the issue to be sent for publication) and updates the status of all of the manuscripts in the issue to "Published."  An editor may publish an issue with the following command:
 
 
 ```publish [manuscriptID]```
 
 
+### Reviewer functionality:
 
+
+REGISTER: This command registers a reviewer.  We collect information about a reviewer's affiliation and email because this is one of the only opportunities to do so.  This command also assumed that users are not retired upon registration.  A user may register a reviewer using the following command:
+
+
+```register reviewer [fname] [lname] [email] "[affiliation]" [RICode1] [RICode2] [RICode3] ```
+
+
+RESIGN: This command resigns a reviewer.  This command updates the Retired field of a user, and thanks the user, and logs out the user.  The reviews that a resigned reviewer has not completed will not appear in the tallies for valid reviews to determine manuscript approval.  In addition, the user will not be able to login after resigning.  A reviewer may resign using the following command:
+
+
+```resign```
+
+
+LOGIN: A user may login to a reviewer account using the following command:
+
+
+```login reviewer [reviewerID]```
+
+
+This will also be followed by the output from the "Status" command.
+
+
+STATUS: A user may show the status of his or her reviewer account, which will provide a summary of the number of manuscripts in various phases associated with the reivewer. Please note that using the "List" command will show specific information about manuscripts with which the reviewer is associated. A reviewer may see status using the following command:
+
+
+```status```
+
+
+LIST: This command shows specific information about the manuscripts with which the reviewer is associated. A reviewer may see his or her list of manuscripts using the following command:
+
+
+```list```
+
+
+REVIEW: This command allows a reviewer to submit a review about a specific manuscript.  This command checks that the reviewer has the authority to review the manuscript and that the manuscript is under review.  The manuscript records the timestamp of the recommendation(accept/reject) and notes all the scores in the review table.  We designed this command so that a reviewer may revise his or her review.  A reviewer may review a manuscript with the following command:
+
+
+```review [recommendation] [manuscriptID] [appropriateness] [clarity] [methodology] [contributionToField]```
 
 
 
