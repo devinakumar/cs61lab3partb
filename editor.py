@@ -89,12 +89,12 @@ class Editor:
             reviewerId = int(input[2])
 
             # check if editor is assigned to manuscript
-            query6 = "SELECT EditorId FROM Manuscript WHERE ManuscriptId = %d;" % (manuscriptId)
+            query6 = "SELECT EditorId FROM Manuscript WHERE ManuscriptId = %d AND `Status` IN ('Received','Under Review');" % (manuscriptId)
             cursor6 = self.con.cursor(buffered=True)
             cursor6.execute(query6)
             resultEditor = cursor6.fetchone()
             if resultEditor[0] != self.id:
-                print("Sorry, but you do not have the authority to assign reviewers for this manuscript.")
+                print("Sorry, but you do not have the authority to assign reviewers for this manuscript, or the manuscript is not in a state where it needs assigning.")
                 cursor6.close()
                 return
             cursor6.close()
