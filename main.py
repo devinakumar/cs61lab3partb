@@ -202,11 +202,17 @@ if __name__ == "__main__":
                     else:
                         print("Only authors may submit manuscripts.")
                 elif command == 'reject':
-                    print(type(user))
+                    # print(type(user))
                     if isinstance(user, Editor):
                         user.reject(int(input[1]))
                     else:
                         print("Only editors may reject manuscripts.")
+                elif command == 'accept':
+                    # print(type(user))
+                    if isinstance(user, Editor):
+                        user.accept(int(input[1]))
+                    else:
+                        print("Only editors may accept manuscripts.")
                 elif command == 'quit':
                     running = False
 
