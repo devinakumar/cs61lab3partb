@@ -88,7 +88,7 @@ if __name__ == "__main__":
                     user.list()
                 elif command == 'assign':
                     if isinstance(user, Editor):
-                        user.assign(int(input[1]), int(input[2]))
+                        user.assign(input)
                     else:
                         print("Only editors may assign manuscripts to reviewers.")
                 elif command == 'submit':
