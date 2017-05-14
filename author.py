@@ -75,6 +75,7 @@ class PrimaryAuthor:
             self.__submitHelper(title, affiliation, RICode, secondaryAuthors, filename)
         except (ValueError, IndexError):
             print ("Invalid. Usage: submit <title> <Affiliation> <RICode> <author2> <author3> <author4> <filename>")
+            return
 
     def __submitHelper(self, title, affiliation, ri, secondaryAuths, filename):
         manuscriptID = -1
@@ -90,6 +91,7 @@ class PrimaryAuthor:
         except IndexError, e:
             print(e)
             self.con.rollback()
+            return
         authorCursor.close()
 
         # Now we need to perform the insert and return the manuscript ID
@@ -112,15 +114,16 @@ class PrimaryAuthor:
             self.con.commit()
             manuscriptID = cursor.lastrowid
         except (IndexError, mysql.connector.Error) as e:
-            if str(e).contains("UserException1001"):
+            if "UserException1001" in str(e):
                 print("Either the RICode is invalid, or there are not 3 reviewers interested in it")
             else:
                 print(e)
             self.con.rollback()
+            return
 
         # insert secondary authors
         for index, author in enumerate(secondaryAuths):
-            self.__createSecondaryAuthor(author, index, manuscriptID)
+            self.__createSecondaryAuthor(author, index + 1, manuscriptID)
 
         print("Created a manuscript with ID=%s" % manuscriptID)
         cursor.close()
@@ -140,8 +143,10 @@ class PrimaryAuthor:
                 self.con.commit()
             except IndexError:
                 self.con.rollback()
+                return
         except IndexError:
             print("You did not enter a valid secondary author name")
+            return
 
     def retract(self, manuscriptId):
         return
