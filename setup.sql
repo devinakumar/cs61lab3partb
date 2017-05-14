@@ -964,7 +964,7 @@ BEGIN
       WHERE r.Retired = '0' AND ri.RICode = new.RICode)
     < 3)
   THEN
-    SET signal_message = CONCAT('UserException: Less than 3 reviewers are interested in the RICode =', CAST(new.RICode as CHAR));
+    SET signal_message = CONCAT('UserException1001: Less than 3 reviewers are interested in the RICode =', CAST(new.RICode as CHAR));
     SIGNAL SQLSTATE '45000' SET message_text = signal_message;
   END IF;
 END
