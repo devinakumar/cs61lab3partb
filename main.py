@@ -229,6 +229,12 @@ if __name__ == "__main__":
                         user.publish(int(input[1]), input[2])
                     else:
                         print("Only editors may publish manuscripts.")
+                elif command == 'review':
+                    # print(type(user))
+                    if isinstance(user, Reviewer):
+                        user.review(input[1], int(input[2]), int(input[3]), int(input[4]), int(input[5]), int(input[6]))
+                    else:
+                        print("Only Reviewers may reviewer manuscripts.")
                 elif command == 'retract':
                     if isinstance(user, PrimaryAuthor):
                         user.retract(input)

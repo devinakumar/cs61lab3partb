@@ -3,6 +3,7 @@
 from __future__ import print_function        # make print a function
 import mysql.connector                       # mysql functionality
 import sys                                   # for misc errors
+from datetime import datetime                # get datetime
 
 
 class Reviewer:
@@ -63,5 +64,48 @@ class Reviewer:
 
         cursor.close()
 
-    def review(self, manuscriptId, appropriateness, clarity, methodology, fieldContribution, recommendation):
+    def review(self, recommendation, manuscriptId, appropriateness, clarity, methodology, fieldContribution):
+        # check if reviewer has been assigned to manuscript
+        query = "SELECT COUNT(*) FROM Review WHERE ManuscriptId = %d AND ReviewerId = %d;" % (manuscriptId, self.id)
+        cursor = self.con.cursor(buffered=True)
+        cursor.execute(query)
+        manuscriptNumber = cursor.fetchone()[0]
+        # print(manuscriptNumber)
+        if manuscriptNumber < 1:
+            print("This reviewer has not been assigned to review this manuscript.")
+            cursor.close()
+            return
+        cursor.close()
+
+        # check if manuscript is under review
+        query2 = "SELECT Status FROM Manuscript WHERE ManuscriptId = %d;" % (manuscriptId)
+        cursor2 = self.con.cursor(buffered=True)
+        cursor2.execute(query2)
+        resultManuscript = cursor2.fetchone()
+        if resultManuscript[0] not in ('Under Review'):
+            print("Sorry, but this manuscript is not in the reviewing process.")
+            cursor2.close()
+            return
+        cursor2.close()
+
+        # submit review
+        print(recommendation)
+        if recommendation == 'accept':
+            timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            query3 = "UPDATE Review SET Appropriateness=%d, Clarity=%d, Methodology=%d, ContributionField=%d, Recommendation='%s', DateCompleted='%s' WHERE ManuscriptId=%d AND ReviewerId=%d;" % (appropriateness, clarity, methodology, fieldContribution, 'Accept', timestamp, manuscriptId, self.id)
+            cursor3 = self.con.cursor(buffered=True)
+            cursor3.execute(query3)
+            self.con.commit()
+            cursor3.close()
+        elif recommendation == 'reject':
+            print("in reject")
+            timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            query4 = "UPDATE Review SET Appropriateness=%d, Clarity=%d, Methodology=%d, ContributionField=%d, Recommendation='%s', DateCompleted='%s' WHERE ManuscriptId=%d AND ReviewerId=%d;" % (appropriateness, clarity, methodology, fieldContribution, 'Reject', timestamp, manuscriptId, self.id)
+            cursor4 = self.con.cursor(buffered=True)
+            cursor4.execute(query4)
+            self.con.commit()
+            cursor4.close()
+        else:
+            print("Recommendation must be accept or reject.")
+            return
         return
