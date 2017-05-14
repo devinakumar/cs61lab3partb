@@ -18,6 +18,11 @@ import config
 
 user = None
 
+REGISTER_ERROR = "Invalid. Usage: register [author/reviewer/editor] ..."
+REGISTER_EDITOR_ERROR = "Invalid. Usage: register editor FirstName LastName"
+REGISTER_AUTHOR_ERROR = "Invalid. Usage: register author FirstName LastName Email \"MailingAddress\""
+REGISTER_REVIEWER_ERROR = "Invalid. Usage: register reviewer FirstName LastName Email Affiliation RICode [RICode] [RICode]"
+
 
 def login(input):
     try:
@@ -27,7 +32,7 @@ def login(input):
         if userType == "Author":
             userType = "PrimaryAuthor"
 
-        query = "SELECT COUNT(*) FROM %s WHERE %sId = %d" % (userType, userType, userId)
+        query = "SELECT COUNT(*) FROM %s WHERE %sId = %d;" % (userType, userType, userId)
 
         # initialize a cursor
         cursor = con.cursor()
@@ -55,117 +60,93 @@ def register(input, con):
             userType = "PrimaryAuthor"
 
         if userType == "Editor":
-            if len(input) == 4 and input[2] is not None and input[3] is not None:
-                registerEditor(con, input[2], input[3])
-            else:
-                print("Please make sure that you have inputted values for first and last names.\nPlease follow this format: register editor FirstName LastName")
-                return
+            registerEditor(con, input)
         elif userType == "Reviewer":
             registerReviewer(con, input)
-            return
         elif userType == "PrimaryAuthor":
-            if len(input) == 6 and input[2] is not None and input[3] is not None and input[4] is not None and input[5] is not None:
-                registerAuthor(con, input[2], input[3], input[4], input[5])
-            else:
-                print("Please register a new author using the following format:\n register author FirstName LastName Email \"MailingAddress\"")
-    # cursor.close()
+            registerAuthor(con, input)
     except(ValueError, IndexError, NameError):
-        print("Please use the correct syntax for register.")
+        print(REGISTER_ERROR)
 
 
-def registerEditor(con, fname, lname):
+def registerEditor(con, input):
     try:
-        query = "INSERT INTO Editor (FirstName, LastName) VALUES ('%s', '%s')" % (fname, lname)
+        if len(input) == 4 and input[2] is not None and input[3] is not None:
+            fname = input[2]
+            lname = input[3]
 
-        # initialize a cursor and query db
-        cursor = con.cursor()
-        try:
+            query = "INSERT INTO Editor (FirstName, LastName) VALUES ('%s', '%s')" % (fname, lname)
+
+            # initialize a cursor and query db
+            cursor = con.cursor()
             cursor.execute(query)
             con.commit()
-        # print("herere")
-        except(ValueError, IndexError, NameError):
-            print("could not register editor")
-            con.rollback()
-        cursor.close()
 
+            print("Created an editor with ID=%s" % cursor.lastrowid)
+            cursor.close()
+        else:
+            print(REGISTER_EDITOR_ERROR)
     except(ValueError, IndexError, NameError):
-        print("User does not exist")
+        print(REGISTER_EDITOR_ERROR)
 
 
 def registerReviewer(con, input):
-    riCodes = len(input) - 6
-    if len(input) >= 7 and len(input) <= 9:
-        fname = input[2]
-        lname = input[3]
-        email = input[4]
-        affiliation = input[5]
-        retired = 0
-    else:
-        print("Invalid. Usage: register reviewer FirstName LastName Email Affiliation RICode [RICode] [RICode]")
-        return
-
     try:
+        riCodes = len(input) - 6
+        if len(input) >= 7 and len(input) <= 9:
+            fname = input[2]
+            lname = input[3]
+            email = input[4]
+            affiliation = input[5]
+            retired = 0
+        else:
+            raise ValueError()
+
         query = "INSERT INTO Reviewer (FirstName, LastName, Email, Affiliation, Retired) VALUES ('%s', '%s', '%s', '%s', '%s')" % (fname, lname, email, affiliation, retired)
 
         # initialize a cursor and query db
         cursor = con.cursor()
-        try:
-            cursor.execute(query)
-            con.commit()
-            reviewerID = cursor.lastrowid
-            for x in range(0, riCodes):
-                print(x)
-                registerReviewerInterest(con, int(reviewerID), int(input[6 + x]))
-            print("Created a reviewer with ID=%s" % reviewerID)
-            # print("herere")
-        except IndexError, e:
-            print(e)
-            print("EXCEPT IN REGISTER REVIEWER")
-            con.rollback()
-        cursor.close()
+        cursor.execute(query)
 
-    # except(ValueError,IndexError, NameError):
-    #   print("User does not exist")
-    except TypeError, e:
-        print(e)
+        reviewerID = cursor.lastrowid
+        for x in range(0, riCodes):
+            registerReviewerInterest(con, int(reviewerID), int(input[6 + x]))
+
+        con.commit()
+        print("Created a reviewer with ID=%s" % reviewerID)
+        cursor.close()
+    except (ValueError, NameError, IndexError, TypeError):
+        print(REGISTER_REVIEWER_ERROR)
 
 
 def registerReviewerInterest(con, reviewerID, ri):
-    query = "INSERT INTO ReviewerInterests (RICode, ReviewerId) VALUES (%d, %d)" % (ri, reviewerID)
-    cursor = con.cursor()
     try:
-        cursor.execute(query)
-        con.commit()
-        print("registering reviewer interests")
-    except(ValueError, IndexError, NameError):
-        print("EXCEPT IN REGISTER REVIEWER INTEREST")
-        con.rollback()
-    cursor.close()
-
-
-def registerAuthor(con, fname, lname, email, address):
-    print("in register author beginning")
-    print(fname, lname, email, address)
-    # affiliation = None
-    try:
-        query = "INSERT INTO PrimaryAuthor (FirstName, LastName, Email, MailingAddress) VALUES ('%s', '%s', '%s', '%s')" % (fname, lname, email, address)
-
-        # initialize a cursor and query db
+        query = "INSERT INTO ReviewerInterests (RICode, ReviewerId) VALUES (%d, %d)" % (ri, reviewerID)
         cursor = con.cursor()
-        try:
+        cursor.execute(query)
+        cursor.close()
+    except(ValueError, IndexError, NameError, TypeError):
+        print(REGISTER_REVIEWER_ERROR)
+
+
+def registerAuthor(con, input):
+    try:
+        if len(input) == 6 and input[2] is not None and input[3] is not None and input[4] is not None and input[5] is not None:
+            fname = input[2]
+            lname = input[3]
+            email = input[4]
+            address = input[5]
+
+            query = "INSERT INTO PrimaryAuthor (FirstName, LastName, Email, MailingAddress) VALUES ('%s', '%s', '%s', '%s')" % (fname, lname, email, address)
+            cursor = con.cursor()
             cursor.execute(query)
             con.commit()
             print("Created an author with ID=%s" % cursor.lastrowid)
-        except(ValueError, IndexError, NameError):
-            print("EXCEPT IN REGISTER AUTHOR")
-            con.rollback()
-        cursor.close()
-
-    # except(ValueError,IndexError, NameError):
-    #   print("User does not exist")
-    except TypeError, e:
-        print(e)
-
+            cursor.close()
+        else:
+            print(REGISTER_AUTHOR_ERROR)
+    except (ValueError, IndexError, NameError, TypeError):
+        print(REGISTER_AUTHOR_ERROR)
 
 if __name__ == "__main__":
     try:
@@ -177,7 +158,8 @@ if __name__ == "__main__":
             try:
                 input = shlex.split(raw_input('> '))
                 command = input[0]
-                print(input)
+
+                # print(command)
 
                 if command == 'login':
                     user = login(input)
@@ -243,8 +225,11 @@ if __name__ == "__main__":
                 elif command == 'quit':
                     running = False
 
+                # reset db connection
+                con = mysql.connector.connect(host=config.SERVER, user=config.USERNAME, password=config.PASSWORD, database=config.DATABASE)
             except mysql.connector.Error as e:        # catch SQL errors
-                print("SQL Error: {0}".format(e.msg))
+                con.rollback()
+                print("Invalid: {0}".format(e.msg))
     except:                                   # anything else
         print("Unexpected error: {0}".format(sys.exc_info()[0]))
 
@@ -254,4 +239,4 @@ if __name__ == "__main__":
     except NameError:
         pass
 
-    print("\nConnection terminated.", end='')
+    print("\nConnection terminated.\n\n", end='')
