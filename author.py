@@ -74,7 +74,7 @@ class PrimaryAuthor:
             filename = input[-1]
             self.__submitHelper(title, affiliation, RICode, secondaryAuthors, filename)
         except (ValueError, IndexError):
-            print ("Invalid. Usage: submit <title> <Affiliation> <RICode> <author2> <author3> <author4> <filename>")
+            print ("Invalid. Usage: submit title <Affiliation> <RICode> <author2> <author3> <author4> <filename>")
             return
 
     def __submitHelper(self, title, affiliation, ri, secondaryAuths, filename):
