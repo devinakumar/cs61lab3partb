@@ -632,7 +632,7 @@ INSERT INTO JournalIssue (Year,Period,PrintDate) VALUES (2016,'4',NULL);
 INSERT INTO JournalIssue (Year,Period,PrintDate) VALUES (2017,'4',NULL);
 
 /*Manuscript*/
-INSERT INTO Manuscript (Title,DateReceived,`Status`,RICode,PrimaryAuthorId,EditorId,PagesOccupied,StartingPage,`Order`,Document,JournalIssueYear,JournalIssuePeriod, PrimaryAuthorAffiliation, DateAcceptReject) VALUES ("lectus pede, ultrices","2017-01-20 22:43:25","Published",1,15,26,4,5,2,"",2016,'1', 'abc', "2017-01-24 23:43:25");
+INSERT INTO Manuscript (Title,DateReceived,`Status`,RICode,PrimaryAuthorId,EditorId,PagesOccupied,StartingPage,`Order`,Document,JournalIssueYear,JournalIssuePeriod, PrimaryAuthorAffiliation, DateAcceptReject) VALUES ("lectus pede, ultrices","2017-01-20 22:43:25","Scheduled",1,15,26,4,5,2,"",2016,'2', 'abc', "2017-01-24 23:43:25");
 INSERT INTO Manuscript (Title,DateReceived,`Status`,RICode,PrimaryAuthorId,EditorId,PagesOccupied,StartingPage,`Order`,Document,JournalIssueYear,JournalIssuePeriod, PrimaryAuthorAffiliation, DateAcceptReject) VALUES ("eu neque pellentesque","2017-01-26 04:23:12","Typeset",2,84,99,NULL,NULL,NULL,"",NULL,NULL, 'Shell', "2017-01-28 04:23:12");
 INSERT INTO Manuscript (Title,DateReceived,`Status`,RICode,PrimaryAuthorId,EditorId,PagesOccupied,StartingPage,`Order`,Document,JournalIssueYear,JournalIssuePeriod, PrimaryAuthorAffiliation, DateAcceptReject) VALUES ("Phasellus","2016-09-30 12:39:15","Rejected",3,49,44,NULL,NULL,NULL,"",NULL,NULL, 'Dartmouth', "2016-10-30 12:39:15");
 INSERT INTO Manuscript (Title,DateReceived,`Status`,RICode,PrimaryAuthorId,EditorId,PagesOccupied,StartingPage,`Order`,Document,JournalIssueYear,JournalIssuePeriod, PrimaryAuthorAffiliation, DateAcceptReject) VALUES ("Cras","2016-12-31 06:33:53","Under Review",4,31,92,NULL,NULL,NULL,"",NULL,NULL, 'JHU', NULL);
@@ -648,6 +648,8 @@ INSERT INTO Manuscript (Title,DateReceived,`Status`,RICode,PrimaryAuthorId,Edito
 INSERT INTO Manuscript (Title,DateReceived,`Status`,RICode,PrimaryAuthorId,EditorId,PagesOccupied,StartingPage,`Order`,Document,JournalIssueYear,JournalIssuePeriod, PrimaryAuthorAffiliation, DateAcceptReject) VALUES ("vulputate,","2016-08-30 02:48:36","Received",10,39,19,NULL,NULL,NULL,"",NULL,NULL,'Yale', NULL);
 INSERT INTO Manuscript (Title,DateReceived,`Status`,RICode,PrimaryAuthorId,EditorId,PagesOccupied,StartingPage,`Order`,Document,JournalIssueYear,JournalIssuePeriod, PrimaryAuthorAffiliation, DateAcceptReject) VALUES ("euismod mauris","2018-04-09 06:25:01","Received",10,29,10,NULL,NULL,NULL,"",NULL,NULL,'Stanford', NULL);
 INSERT INTO Manuscript (Title,DateReceived,`Status`,RICode,PrimaryAuthorId,EditorId,PagesOccupied,StartingPage,`Order`,Document,JournalIssueYear,JournalIssuePeriod, PrimaryAuthorAffiliation, DateAcceptReject) VALUES ("consectetuer ipsum","2017-08-07 10:09:32","Received",10,55,81,NULL,NULL,NULL,"",NULL,NULL,'UW', NULL);
+INSERT INTO Manuscript (Title,DateReceived,`Status`,RICode,PrimaryAuthorId,EditorId,PagesOccupied,StartingPage,`Order`,Document,JournalIssueYear,JournalIssuePeriod, PrimaryAuthorAffiliation, DateAcceptReject) VALUES ("lectus pede, ultrices","2017-01-20 22:43:25","Scheduled",1,15,26,8,5,2,"",2016,'2', 'abc', "2017-01-24 23:43:25");
+
 
 
 

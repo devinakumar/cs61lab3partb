@@ -5,6 +5,8 @@ from datetime import datetime                # get datetime
 import mysql.connector                       # mysql functionality
 import sys                                   # for misc errors
 
+CURRENT_YEAR = 2016
+
 
 class Editor:
     def __init__(self, id, connection):
@@ -226,6 +228,12 @@ class Editor:
         return
 
     def schedule(self, manuscriptId, year, period):
+        if year < CURRENT_YEAR:
+            print("This is not a valid year for publication.  Please enter a valid publication year.")
+            return
+        if period not in ('1', '2', '3', '4'):
+            print("This is not a valid issue number.  Please choose among numbers 1, 2, 3, and 4.")
+            return
         # check if editor is assigned to manuscript
         query = "SELECT EditorId FROM Manuscript WHERE ManuscriptId = %d;" % (manuscriptId)
         cursor = self.con.cursor(buffered=True)
@@ -261,15 +269,50 @@ class Editor:
         query4 = "SELECT COUNT(*) FROM JournalIssue WHERE Year = %d AND Period = '%s' AND PrintDate IS NULL;" % (year, period)
         cursor4 = self.con.cursor(buffered=True)
         cursor4.execute(query4)
-        issuePublished = cursor4.fetchone()[0]
-        if issuePublished >= 1:
-            print("This issue has already been published/set for publication.")
+        issueExists = cursor4.fetchone()[0]
+        if issueExists == 0:
             cursor4.close()
-            return
-        cursor4.close()
-        # add up all of the manuscripts that are already in the issue; if adding this one would exceed 100, then do not add it
-        # if all these checks pass, add the manuscript
+            query5 = "INSERT INTO JournalIssue (Year, Period) VALUES (%d, '%s');" % (year, period)
+            print("making a new issue")
+            cursor5 = self.con.cursor(buffered=True)
+            cursor5.execute(query5)
+            self.con.commit()
+            cursor5.close()
+        else:
+            cursor4.close()
+            # add up all of the manuscripts that are already in the issue; if adding this one would exceed 100, then do not add it
+            query5 = "SELECT PagesOccupied FROM Manuscript WHERE JournalIssueYear=%d AND JournalIssuePeriod='%s';" % (year, period)
+            print("checking pages")
+            cursor5 = self.con.cursor(buffered=True)
+            cursor5.execute(query5)
+            issueManuscripts = cursor5.fetchall()
+            print(issueManuscripts)
+            count = 0
+            for manuscript in issueManuscripts:
+                print(manuscript)
+                count = count + manuscript[0]
+            cursor5.close()
+            if count >= 100:
+                print("This issue is already full.  Please schedule this manuscript for a different issue.")
+                return
+            query6 = "SELECT PagesOccupied FROM Manuscript WHERE ManuscriptId=%d;" % (manuscriptId)
+            cursor6 = self.con.cursor(buffered=True)
+            cursor6.execute(query6)
+            finalCount = cursor6.fetchone()[0] + count
+            if finalCount > 100:
+                print("The addition of this manuscript would make the issue exceed its page limit.  Please assign the manuscript to a different issue.")
+                cursor6.close()
+                return
+            # print(count)
+            # print(finalCount)
+            cursor6.close()
 
+        # if all these checks pass, add the manuscript
+        query7 = "UPDATE Manuscript SET Status='%s', JournalIssueYear=%d, JournalIssuePeriod='%s' WHERE ManuscriptId=%d;" % ('Scheduled', year, period, manuscriptId)
+        cursor7 = self.con.cursor(buffered=True)
+        cursor7.execute(query7)
+        self.con.commit()
+        cursor7.close()
         return
 
     def publish(self, issue):
