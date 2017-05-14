@@ -53,8 +53,16 @@ class Reviewer:
             print(REGISTER_ERROR)
 
     def resign(self):
-        print("Thank you for your service.")
-        return
+        try:
+            query = "UPDATE Reviewer SET Retired=%d WHERE ReviewerId=%d;" % (1, self.id)
+            cursor = con.cursor()
+            cursor.execute(query)
+            con.commit()
+            cursor.close()
+            print("Thank you for your service.")
+            return
+        except(ValueError, IndexError, NameError, TypeError):
+            print("Unable to resign.")
 
     def greeting(self):
         # Retrieve basic information
