@@ -5,14 +5,52 @@ import mysql.connector                       # mysql functionality
 import sys                                   # for misc errors
 from datetime import datetime                # get datetime
 
+REGISTER_ERROR = "Invalid. Usage: register reviewer FirstName LastName Email Affiliation RICode [RICode] [RICode]"
+
 
 class Reviewer:
     def __init__(self, id, connection):
         self.id = id
         self.con = connection
 
-    def register(self, fname, lname, RICodes):
-        return
+    @staticmethod
+    def register(con, input):
+        try:
+            riCodes = len(input) - 6
+            if len(input) >= 7 and len(input) <= 9:
+                fname = input[2]
+                lname = input[3]
+                email = input[4]
+                affiliation = input[5]
+                retired = 0
+            else:
+                raise ValueError()
+
+            query = "INSERT INTO Reviewer (FirstName, LastName, Email, Affiliation, Retired) VALUES ('%s', '%s', '%s', '%s', '%s')" % (fname, lname, email, affiliation, retired)
+
+            # initialize a cursor and query db
+            cursor = con.cursor()
+            cursor.execute(query)
+
+            reviewerID = cursor.lastrowid
+            for x in range(0, riCodes):
+                Reviewer.insertReviewerInterest(con, int(reviewerID), int(input[6 + x]))
+
+            con.commit()
+            print("Created a reviewer with ID=%s" % reviewerID)
+            cursor.close()
+        except (ValueError, NameError, IndexError, TypeError):
+            print(REGISTER_ERROR)
+
+    @staticmethod
+    def insertReviewerInterest(con, reviewerID, ri):
+        try:
+            query = "INSERT INTO ReviewerInterests (RICode, ReviewerId) VALUES (%d, %d)" % (ri, reviewerID)
+            cursor = con.cursor()
+            cursor.execute(query)
+            cursor.close()
+        except(ValueError, IndexError, NameError, TypeError):
+            print(REGISTER_ERROR)
 
     def resign(self):
         print("Thank you for your service.")

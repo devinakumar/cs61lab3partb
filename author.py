@@ -6,14 +6,33 @@ import shlex                                 # for parsing
 import mysql.connector                       # mysql functionality
 # import sys                                   # for misc errors
 
+REGISTER_ERROR = "Invalid. Usage: register author FirstName LastName Email \"MailingAddress\""
+
 
 class PrimaryAuthor:
     def __init__(self, id, connection):
         self.id = id
         self.con = connection
 
-    def register(self, fname, lname, email, address):
-        return
+    @staticmethod
+    def register(con, input):
+        try:
+            if len(input) == 6 and input[2] is not None and input[3] is not None and input[4] is not None and input[5] is not None:
+                fname = input[2]
+                lname = input[3]
+                email = input[4]
+                address = input[5]
+
+                query = "INSERT INTO PrimaryAuthor (FirstName, LastName, Email, MailingAddress) VALUES ('%s', '%s', '%s', '%s')" % (fname, lname, email, address)
+                cursor = con.cursor()
+                cursor.execute(query)
+                con.commit()
+                print("Created an author with ID=%s" % cursor.lastrowid)
+                cursor.close()
+            else:
+                print(REGISTER_AUTHOR_ERROR)
+        except (ValueError, IndexError, NameError, TypeError):
+            print(REGISTER_ERROR)
 
     def greeting(self):
         # Retrieve basic information

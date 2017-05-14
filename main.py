@@ -19,9 +19,6 @@ import config
 user = None
 
 REGISTER_ERROR = "Invalid. Usage: register [author/reviewer/editor] ..."
-REGISTER_EDITOR_ERROR = "Invalid. Usage: register editor FirstName LastName"
-REGISTER_AUTHOR_ERROR = "Invalid. Usage: register author FirstName LastName Email \"MailingAddress\""
-REGISTER_REVIEWER_ERROR = "Invalid. Usage: register reviewer FirstName LastName Email Affiliation RICode [RICode] [RICode]"
 
 
 def login(input):
@@ -56,97 +53,17 @@ def login(input):
 def register(input, con):
     try:
         userType = input[1].capitalize()
-        if userType == "Author":
-            userType = "PrimaryAuthor"
-
         if userType == "Editor":
-            registerEditor(con, input)
+            Editor.register(con, input)
         elif userType == "Reviewer":
-            registerReviewer(con, input)
-        elif userType == "PrimaryAuthor":
-            registerAuthor(con, input)
-    except(ValueError, IndexError, NameError):
-        print(REGISTER_ERROR)
-
-
-def registerEditor(con, input):
-    try:
-        if len(input) == 4 and input[2] is not None and input[3] is not None:
-            fname = input[2]
-            lname = input[3]
-
-            query = "INSERT INTO Editor (FirstName, LastName) VALUES ('%s', '%s')" % (fname, lname)
-
-            # initialize a cursor and query db
-            cursor = con.cursor()
-            cursor.execute(query)
-            con.commit()
-
-            print("Created an editor with ID=%s" % cursor.lastrowid)
-            cursor.close()
-        else:
-            print(REGISTER_EDITOR_ERROR)
-    except(ValueError, IndexError, NameError):
-        print(REGISTER_EDITOR_ERROR)
-
-
-def registerReviewer(con, input):
-    try:
-        riCodes = len(input) - 6
-        if len(input) >= 7 and len(input) <= 9:
-            fname = input[2]
-            lname = input[3]
-            email = input[4]
-            affiliation = input[5]
-            retired = 0
+            Reviewer.register(con, input)
+        elif userType == "Author":
+            PrimaryAuthor.register(con, input)
         else:
             raise ValueError()
-
-        query = "INSERT INTO Reviewer (FirstName, LastName, Email, Affiliation, Retired) VALUES ('%s', '%s', '%s', '%s', '%s')" % (fname, lname, email, affiliation, retired)
-
-        # initialize a cursor and query db
-        cursor = con.cursor()
-        cursor.execute(query)
-
-        reviewerID = cursor.lastrowid
-        for x in range(0, riCodes):
-            registerReviewerInterest(con, int(reviewerID), int(input[6 + x]))
-
-        con.commit()
-        print("Created a reviewer with ID=%s" % reviewerID)
-        cursor.close()
-    except (ValueError, NameError, IndexError, TypeError):
-        print(REGISTER_REVIEWER_ERROR)
-
-
-def registerReviewerInterest(con, reviewerID, ri):
-    try:
-        query = "INSERT INTO ReviewerInterests (RICode, ReviewerId) VALUES (%d, %d)" % (ri, reviewerID)
-        cursor = con.cursor()
-        cursor.execute(query)
-        cursor.close()
     except(ValueError, IndexError, NameError, TypeError):
-        print(REGISTER_REVIEWER_ERROR)
+        print(REGISTER_ERROR)
 
-
-def registerAuthor(con, input):
-    try:
-        if len(input) == 6 and input[2] is not None and input[3] is not None and input[4] is not None and input[5] is not None:
-            fname = input[2]
-            lname = input[3]
-            email = input[4]
-            address = input[5]
-
-            query = "INSERT INTO PrimaryAuthor (FirstName, LastName, Email, MailingAddress) VALUES ('%s', '%s', '%s', '%s')" % (fname, lname, email, address)
-            cursor = con.cursor()
-            cursor.execute(query)
-            con.commit()
-            print("Created an author with ID=%s" % cursor.lastrowid)
-            cursor.close()
-        else:
-            print(REGISTER_AUTHOR_ERROR)
-    except (ValueError, IndexError, NameError, TypeError):
-        print(REGISTER_AUTHOR_ERROR)
 
 if __name__ == "__main__":
     try:

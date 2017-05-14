@@ -6,12 +6,34 @@ import mysql.connector                       # mysql functionality
 import sys                                   # for misc errors
 
 CURRENT_YEAR = 2016
+REGISTER_ERROR = "Invalid. Usage: register editor FirstName LastName"
 
 
 class Editor:
     def __init__(self, id, connection):
         self.id = id
         self.con = connection
+
+    @staticmethod
+    def register(con, input):
+        try:
+            if len(input) == 4 and input[2] is not None and input[3] is not None:
+                fname = input[2]
+                lname = input[3]
+
+                query = "INSERT INTO Editor (FirstName, LastName) VALUES ('%s', '%s')" % (fname, lname)
+
+                # initialize a cursor and query db
+                cursor = con.cursor()
+                cursor.execute(query)
+                con.commit()
+
+                print("Created an editor with ID=%s" % cursor.lastrowid)
+                cursor.close()
+            else:
+                print(REGISTER_ERROR)
+        except(ValueError, IndexError, NameError):
+            print(REGISTER_ERROR)
 
     def greeting(self):
         # Retrieve basic information
