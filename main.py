@@ -218,6 +218,11 @@ if __name__ == "__main__":
                         user.typeset(int(input[1]), int(input[2]))
                     else:
                         print("Only editors may typeset manuscripts.")
+                elif command == 'retract':
+                    if isinstance(user, PrimaryAuthor):
+                        user.retract(input)
+                    else:
+                        print("Only authors may retract manuscripts.")
                 elif command == 'quit':
                     running = False
 
