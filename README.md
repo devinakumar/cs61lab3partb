@@ -83,6 +83,33 @@ REJECT: This command sets the status of a manuscript to "Rejected."  This comman
 ```reject [manuscriptID]```
 
 
+ACCEPT: This command sets the status of a manuscript to "Accepted."  This command ensures that the editor has the authority to accept the manuscript, that the manuscript is in the appropriate stage to be accepted and that the manuscript has at least 3 completed reviews associated with it.  Then, the command marks that time that the decision was made and sets the status of the manuscript to "Accepted.""  An editor may accept a manuscript with the following command:
+
+
+```accept [manuscriptID]```
+
+
+TYPESET: This command sets the status of a manuscript to "Typeset."  This command ensures that the editor has the authority to typeset the manuscript and that the manuscript is in the appropriate stage to be typeset.  Then, the command updates the status to "Typeset" and stores the number of pages that the manuscript will occupy.  An editor may typeset a manuscript with the following command:
+
+
+```typeset [manuscriptID] [pagesOccupied]```
+
+
+SCHEDULE: This command sets the status of a manuscript to "Scheduled" and assigns it to the appropriate issue.  This command ensures that the year and issue number the editor enters are valid (no past years, no invalid issue numbers), that the editor has the authority to schedule the manuscript, that the manuscript is in the appropriate stage to be scheduled (typeset), that the issue in question has not already been published, that the issue in question exists (if not, then it is created) and that adding the manuscript would not exceed the 100-page limit per issue.  Then, the command updates the status of the manuscript to "Scheduled" and updates the issue number and year.  Unlike the command provided to us in the spec, we decided to implement this by dividing issue into its components, year and period, on the command line.  An editor may schedule a manuscript with the following command:
+
+
+```schedule [manuscriptID] [Year] [Period]```
+
+
+PUBLISH: This command publishes an issue and sets the status of all its manuscripts to "Published."  This command ensures that the issue exists, that it has not already been published and that the issue contains at least 1 manuscript.  Then, the command updates the print date (assumed to be the date/time that the publish decision is made because this causes the issue to be sent for publiaiton) and updates the status of all of the manuscripts in the issue to "Published."  An editor may publish an issue with the following command:
+
+
+```publish [manuscriptID]```
+
+
+
+
+
 
 
 
