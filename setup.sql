@@ -21,6 +21,7 @@ DROP TABLE IF EXISTS `devina_db`.`ReviewerInterests`;
 DROP TABLE IF EXISTS `devina_db`.`Reviewer`;
 DROP TABLE IF EXISTS `devina_db`.`Review`;
 DROP TABLE IF EXISTS `devina_db`.`JournalIssue`;
+DROP TABLE IF EXISTS `devina_db`.`Credential`;
 
 DROP TRIGGER IF EXISTS Manuscript_RICode;
 DROP TRIGGER IF EXISTS Reviewer_Resigns;
@@ -300,6 +301,15 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 PACK_KEYS = Default;
 
+CREATE TABLE IF NOT EXISTS `devina_db`.`Credential` (
+  `UserId` INT(11) NOT NULL,
+  `UserType` ENUM('PrimaryAuthor', 'Reviewer', 'Editor') NOT NULL,
+  `Password` VARCHAR(512)
+  PRIMARY KEY (`UserId`,`UserType`)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+PACK_KEYS = Default;
+
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
@@ -316,6 +326,7 @@ TRUNCATE TABLE `devina_db`.`ReviewerInterests`;
 TRUNCATE TABLE `devina_db`.`Reviewer`;
 TRUNCATE TABLE `devina_db`.`Review`;
 TRUNCATE TABLE `devina_db`.`JournalIssue`;
+TRUNCATE TABLE `devina_db`.`Credential`;
 
 SET FOREIGN_KEY_CHECKS = 1;
 

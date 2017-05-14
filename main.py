@@ -15,6 +15,7 @@ from editor import Editor
 from reviewer import Reviewer
 from author import PrimaryAuthor
 import config
+import hashlib
 
 user = None
 
@@ -55,6 +56,10 @@ def login(input):
         return None
 
 
+def hash(password, salt):
+    return hashlib.sha512(password + salt).hexdigest()
+
+
 def register(input, con):
     try:
         userType = input[1].capitalize()
@@ -84,6 +89,9 @@ if __name__ == "__main__":
                 command = input[0]
 
                 if command == 'login':
+                    if user is not None:
+                        print("Please logout first")
+                        continue
                     user = login(input)
                     if user is not None:
                         user.greeting()

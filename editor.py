@@ -28,7 +28,7 @@ class Editor:
                 cursor.execute(query)
                 con.commit()
 
-                print("Created an editor with ID=%s" % cursor.lastrowid)
+                print("Created an editor with ID=%s... you can now login" % cursor.lastrowid)
                 cursor.close()
             else:
                 print(REGISTER_ERROR)

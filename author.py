@@ -27,7 +27,7 @@ class PrimaryAuthor:
                 cursor = con.cursor()
                 cursor.execute(query)
                 con.commit()
-                print("Created an author with ID=%s" % cursor.lastrowid)
+                print("Created an author with ID=%s... you can now login" % cursor.lastrowid)
                 cursor.close()
             else:
                 print(REGISTER_AUTHOR_ERROR)
