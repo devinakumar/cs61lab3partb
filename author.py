@@ -2,7 +2,8 @@
 
 from __future__ import print_function        # make print a function
 from datetime import datetime                # get datetime
-# import mysql.connector                       # mysql functionality
+import shlex                                 # for parsing
+import mysql.connector                       # mysql functionality
 # import sys                                   # for misc errors
 
 
@@ -71,11 +72,11 @@ class PrimaryAuthor:
             RICode = int(input[3])
             secondaryAuthors = input[4:-1]  # index 3 through 2nd to last
             filename = input[-1]
-            self.submitHelper(title, affiliation, RICode, secondaryAuthors, filename)
+            self.__submitHelper(title, affiliation, RICode, secondaryAuthors, filename)
         except (ValueError, IndexError):
             print ("Invalid. Usage: submit <title> <Affiliation> <RICode> <author2> <author3> <author4> <filename>")
 
-    def submitHelper(self, title, affiliation, ri, secondaryAuths, filename):
+    def __submitHelper(self, title, affiliation, ri, secondaryAuths, filename):
         manuscriptID = -1
 
         # First we need to update the author's affiliation
@@ -100,28 +101,47 @@ class PrimaryAuthor:
         editorCursor = self.con.cursor(buffered=True)
         editorCursor.execute(query)
         result = editorCursor.fetchone()
-        print("result is %s" % result)
         editorID = int(result[0])
-        print("editorID is %d" % editorID)
-        print("editorID is %d" % editorID)
 
+        # insert manuscript
         query = "INSERT INTO Manuscript (Title, DateReceived, Status, RICode, PrimaryAuthorID, EditorID, PrimaryAuthorAffiliation, Document) VALUES ('%s', '%s', '%s', %d, %d, %d, '%s', '%s');" % (title, date, status, ri, self.id, editorID, affiliation, filename)
 
-        # initialize a cursor and query db
         cursor = self.con.cursor(buffered=True)
         try:
             cursor.execute(query)
             self.con.commit()
             manuscriptID = cursor.lastrowid
-        except IndexError, e:
-            print(e)
+        except (IndexError, mysql.connector.Error) as e:
+            if str(e).contains("UserException1001"):
+                print("Either the RICode is invalid, or there are not 3 reviewers interested in it")
+            else:
+                print(e)
             self.con.rollback()
+
+        # insert secondary authors
+        for index, author in enumerate(secondaryAuths):
+            self.__createSecondaryAuthor(author, index, manuscriptID)
 
         print("Created a manuscript with ID=%s" % manuscriptID)
         cursor.close()
         editorCursor.close()
 
         return
+
+    def __createSecondaryAuthor(self, author, bylinePosition, manuscriptId):
+        fullName = shlex.split(author)
+        try:
+            firstName = fullName[0]
+            lastName = ' '.join(fullName[1:])
+            query = "INSERT INTO SecondaryAuthor (BylinePosition, ManuscriptId, FirstName, LastName) VALUES (%d, %d, '%s', '%s');" % (bylinePosition, manuscriptId, firstName, lastName)
+            cursor = self.con.cursor(buffered=True)
+            try:
+                cursor.execute(query)
+                self.con.commit()
+            except IndexError:
+                self.con.rollback()
+        except IndexError:
+            print("You did not enter a valid secondary author name")
 
     def retract(self, manuscriptId):
         return

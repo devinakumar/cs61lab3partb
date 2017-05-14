@@ -196,7 +196,6 @@ if __name__ == "__main__":
                     else:
                         print("Only editors may assign manuscripts to reviewers.")
                 elif command == 'submit':
-                    print(type(user))
                     if isinstance(user, PrimaryAuthor):
                         user.submit(input)
                     else:
