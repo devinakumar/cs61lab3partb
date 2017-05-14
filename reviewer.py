@@ -55,9 +55,9 @@ class Reviewer:
     def resign(self):
         try:
             query = "UPDATE Reviewer SET Retired=%d WHERE ReviewerId=%d;" % (1, self.id)
-            cursor = con.cursor()
+            cursor = self.con.cursor()
             cursor.execute(query)
-            con.commit()
+            self.con.commit()
             cursor.close()
             print("Thank you for your service.")
             return
