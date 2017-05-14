@@ -93,7 +93,6 @@ def registerEditor(con, fname, lname):
 
 
 def registerReviewer(con, input):
-    print("in register reviewer beginning")
     riCodes = len(input) - 6
     if len(input) >= 7 and len(input) <= 9:
         fname = input[2]
@@ -102,7 +101,8 @@ def registerReviewer(con, input):
         affiliation = input[5]
         retired = 0
     else:
-        print("Please register a reviewer with the following format:\nregister reviewer FirstName LastName Email Affiliation RICode [RICode] [RICode]")
+        print("Invalid. Usage: register reviewer FirstName LastName Email Affiliation RICode [RICode] [RICode]")
+        return
 
     try:
         query = "INSERT INTO Reviewer (FirstName, LastName, Email, Affiliation, Retired) VALUES ('%s', '%s', '%s', '%s', '%s')" % (fname, lname, email, affiliation, retired)
@@ -116,7 +116,7 @@ def registerReviewer(con, input):
             for x in range(0, riCodes):
                 print(x)
                 registerReviewerInterest(con, int(reviewerID), int(input[6 + x]))
-            # print(cursor.lastrowid)
+            print("Created a reviewer with ID=%s" % reviewerID)
             # print("herere")
         except IndexError, e:
             print(e)
