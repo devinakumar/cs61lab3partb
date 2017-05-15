@@ -1,5 +1,11 @@
 ## CS 61 Lab 2, Part 5
 ### Functionalities
+QUIT: A user may quit out of the program at any time using the following command:
+
+
+```quit```
+
+
 #### Author functionality:
 
 
@@ -152,6 +158,28 @@ REVIEW: This command allows a reviewer to submit a review about a specific manus
 ### Testing
 
 
+Please run the following command to start the program:
+
+
+```python main.py```
+
+
+The program will prompt you for a key to connect to the database.  Please enter this as the key:
+
+
+```test```
+
+
+To test the register function, please register an editor, an author, and a reviewer.  Please note down the passwords and IDs that you use/the system returns to you.
+
+Editor: ```register editor Devina Kumar``` (password: devina, id: 101)
+
+Author: ```register author Henry Wilson henry.wilson.iii.18@dartmouth.edu "Hinman 1201"``` (password: henry, id: 101)
+
+Reviewer: ```register reviewer Charles Palmer charlespalmer@dartmouth.edu "Dartmouth" 1 2 3``` (password: charles, id: 101)
+
+
+Using the IDs and passwords you just created, please use the ID for the editor you just created to login: ```login editor 101```
 
 
 
