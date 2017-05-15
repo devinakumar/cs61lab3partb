@@ -291,3 +291,6 @@ Now, log out of editor 100's account: ```logout```
 
 Quit the program if you wish: ```quit```
 
+### Extra Credit Part 2 Notes
+ I was unable to login to the User. Thus, I print out all the commands to run in the relevant places (when you register or when a reviewer resigns)
+
