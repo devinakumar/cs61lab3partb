@@ -160,7 +160,7 @@ class Reviewer:
             cursor2.close()
 
             # submit review
-            print(recommendation)
+            # print(recommendation)
             if recommendation == 'accept':
                 timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 query3 = "UPDATE Review SET Appropriateness=%d, Clarity=%d, Methodology=%d, ContributionField=%d, Recommendation='%s', DateCompleted='%s' WHERE ManuscriptId=%d AND ReviewerId=%d;" % (appropriateness, clarity, methodology, fieldContribution, 'Accept', timestamp, manuscriptId, self.id)
@@ -169,7 +169,7 @@ class Reviewer:
                 self.con.commit()
                 cursor3.close()
             elif recommendation == 'reject':
-                print("in reject")
+                # print("in reject")
                 timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 query4 = "UPDATE Review SET Appropriateness=%d, Clarity=%d, Methodology=%d, ContributionField=%d, Recommendation='%s', DateCompleted='%s' WHERE ManuscriptId=%d AND ReviewerId=%d;" % (appropriateness, clarity, methodology, fieldContribution, 'Reject', timestamp, manuscriptId, self.id)
                 cursor4 = self.con.cursor(buffered=True)

@@ -224,7 +224,7 @@ class Editor:
             cursor3.execute(query3)
             # print(cursor3.fetchone()[0])
             validReviews = cursor3.fetchone()[0]
-            print(validReviews)
+            # print(validReviews)
             # print("this is result reviews:")
             # print(resultReviews)
             if validReviews < 3:
@@ -342,10 +342,10 @@ class Editor:
                 cursor5 = self.con.cursor(buffered=True)
                 cursor5.execute(query5)
                 issueManuscripts = cursor5.fetchall()
-                print(issueManuscripts)
+                # print(issueManuscripts)
                 count = 0
                 for manuscript in issueManuscripts:
-                    print(manuscript)
+                    # print(manuscript)
                     count = count + manuscript[0]
                 cursor5.close()
                 if count >= 100:
@@ -379,13 +379,13 @@ class Editor:
             year = int(input[1])
             period = input[2]
 
-            print("in publish")
+            # print("in publish")
             # check if issue has been published
             query = "SELECT COUNT(*) FROM JournalIssue WHERE Year = %d AND Period = '%s' AND PrintDate IS NOT NULL;" % (year, period)
             cursor = self.con.cursor(buffered=True)
             cursor.execute(query)
             issuePublished = cursor.fetchone()[0]
-            print(issuePublished)
+            # print(issuePublished)
             if issuePublished >= 1:
                 print("This issue has already been published/set for publication.")
                 cursor.close()
@@ -397,7 +397,7 @@ class Editor:
             cursor2 = self.con.cursor(buffered=True)
             cursor2.execute(query2)
             issueExists = cursor2.fetchone()[0]
-            print(issueExists)
+            # print(issueExists)
             if issueExists < 1:
                 print("This issue does not exist.  Please try again.")
                 cursor2.close()
@@ -409,7 +409,7 @@ class Editor:
             cursor3 = self.con.cursor(buffered=True)
             cursor3.execute(query3)
             manuscriptNumber = cursor3.fetchone()[0]
-            print(manuscriptNumber)
+            # print(manuscriptNumber)
             if manuscriptNumber < 1:
                 print("There must be at least 1 manuscript schedule to appear in the issue to publish it.")
                 cursor3.close()
