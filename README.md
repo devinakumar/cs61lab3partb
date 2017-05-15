@@ -1,4 +1,11 @@
 ## CS 61 Lab 2, Part 5
+### Setup
+Replace information in config.py with the appropriate testing information (if it is not the login you wish to use)
+
+
+Run setup.sql on the database you choose to use
+
+
 ### Functionalities
 QUIT: A user may quit out of the program at any time using the following command:
 
@@ -283,6 +290,4 @@ The system should not allow a review to be assigned to a reviewer who is retired
 Now, log out of editor 100's account: ```logout```
 
 Quit the program if you wish: ```quit```
-
-
 
