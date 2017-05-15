@@ -110,7 +110,7 @@ SCHEDULE: This command sets the status of a manuscript to "Scheduled" and assign
 PUBLISH: This command publishes an issue and sets the status of all its manuscripts to "Published."  This command ensures that the issue exists, that it has not already been published and that the issue contains at least 1 manuscript.  Then, the command updates the print date (assumed to be the date/time that the publish decision is made because this causes the issue to be sent for publication) and updates the status of all of the manuscripts in the issue to "Published."  An editor may publish an issue with the following command:
 
 
-```publish [manuscriptID]```
+```publish [Year] [Period]```
 
 
 #### Reviewer functionality:
@@ -157,6 +157,8 @@ REVIEW: This command allows a reviewer to submit a review about a specific manus
 
 ### Testing
 
+NOTE: The things in the parentheses are just what the program returned to us, but the password and IDs will likely vary depending on how many times you register a new user/your password choice.  We just included it as a reference.
+
 
 Please run the following command to start the program:
 
@@ -169,7 +171,7 @@ The program will prompt you for a key to connect to the database.  Please enter 
 
 ```test```
 
-
+#### Test register functions
 To test the register function, please register an editor, an author, and a reviewer.  Please note down the passwords and IDs that you use/the system returns to you.
 
 Editor: ```register editor Devina Kumar``` (password: devina, id: 101)
@@ -181,10 +183,106 @@ Reviewer: ```register reviewer Charles Palmer charlespalmer@dartmouth.edu "Dartm
 
 Using the IDs and passwords you just created, please use the ID for the editor you just created to login: ```login editor 101```
 
+After logging in, try logging out: ```logout```
+
+#### Make a manuscript
+Please login to the account of the author you just created and enter the password when prompted: ```login author 101```
+
+Submit a new manuscript: ```submit "My Manuscript" "Dartmouth" "1" "Devina Kumar" "Theodore Geisel" "Text here"``` (ManuscriptID: 18)
+
+Check status (it should now show received as having 1 manuscript): ```status```
+
+List the manuscripts (it should now show more specific information for the manuscript): ```list```
+
+Logout from the author: ```logout```
+
+#### Assign reviews
+Now, to test the editor functions, please log into editor 94's account using the password "test": ```login editor 94``` (password: test)
+
+It should show one manuscript that is received.  Now, to get more information about the manuscript, we use the list command: ```list```
+
+This should show the id of the manuscript (9).  We can now use this to assign the manuscript to reviewers:
+
+```assign 9 7```
+
+```assign 9 49```
+
+```assign 9 54```
+
+All of these reviewers have the appropriate RICodes, but let us try to assign this to a reviewer whose RICode is not compatible: ```assign 9 1```
+
+The manuscript will not be assigned.  Now, let us try to assign a manuscript that does not belong to the editor: ```assign 4 9```
+
+These commands should not have worked.  Now, if we use the status or list command again, we see that the manuscript has moved to the review stage: ```status```
+
+Let us now logout of editor 94's account: ```logout```
+
+#### Review a manuscript
+Now, let us login to reviewer 7's account using the password "test": ```login reviewer 7``` (password: test)
+
+If we use enter the command ```list```, we can see that manuscript 9 is designated to this reviewer.  Let us now enter a review for manuscript 9: ```review accept 9 8 9 8 8```
+
+Let us now logout of reviewer 7's account with the command ```logout``` and login to reviewer 49's account using the password test: ```login reviewer 49``` (password: test)
+
+Again, if we use enter the command ```list```, we can see that manuscript 9 is designated to this reviewer.  Let us now enter a review for manuscript 9: ```review reject 9 5 5 4 3```
+
+Let us now logout of reviewer 49's account with the command ```logout``` and login to reviewer 54's account using the password test: ```login reviewer 54``` (password: test)
+
+Again, if we use enter the command ```list```, we can see that manuscript 9 is designated to this reviewer.  Let us now enter a review for manuscript 9: ```review accept 9 8 7 9 9```
+
+Let us now logout of reviewer 54's account: ```logout```
 
 
+#### Accept/Typeset/Schedule/Publish a manuscript
+Now, to test the editor functions, please log into editor 94's account again using the password "test": ```login editor 94``` (password: test)
+
+Accept the manuscript that we just reviewed: ```accept 9```
+
+If we use the command ```list```, we can see that the status of 9 is now "Accepted."
+
+Now, let us typeset manuscript 9, saying that it will take up 99 pages: ```typeset 9 99```
+
+If we use the command ```list```, we can see that the status of 9 is now "Typeset."
+
+Now, let us schedule manuscript 9 for issue 2 of 2016: ```schedule 9 2016 2```
+
+This should exceed the 100-page limit.  Now, let us try to schedule the manuscript for issue 3 of 2016: ```schedule 9 2016 3```
+
+If we use the command ```list```, we can see that the status of 9 is now "Scheduled."
+
+Now, let us publish issue 3 of 2016: ```publish 2016 3```
+
+If we use the command ```list```, we can see that the status of 9 is now "Published."
+
+Let us now logout of editor 94's account: ```logout```
 
 
+#### Other functions
+Let us login to an author who has submitted a manuscript using the password "test": ```login author 31``` (password: test)
+
+Now, let us retract the manuscript: ```retract 4``` (enter "Yes" on prompt)
+
+If we use the list command, we should see nothing: ```list```
+
+Logout of author 31's account: ```logout```
+
+Login to reviewer 5's account using the password "test": ```login reviewer 5```
+
+Resign reviewer 5: ```resign```
+
+You should be logged out automatically.  Try logging into reviewer 5's account again: ```login reviewer 5```
+
+You should not be able to log in.
+
+Now, login to editor 100's account using the password "test": ```login editor 100``` (password: test)
+
+This editor is assigned to a manuscript whose RICode is an interest of ex-reviewer 5.  Let us try to assign reviewer 5 to review this manuscript: ```assign 7 5```
+
+The system should not allow a review to be assigned to a reviewer who is retired.
+
+Now, logout of editor 100's account: ```logout```
+
+Quit the program if you wish: ```quit```
 
 
 
