@@ -3,7 +3,7 @@
 Replace information in config.py with the appropriate testing information (if it is not the login you wish to use)
 
 
-Run setup.sql on the database you choose to use
+Run setup.sql or setupEmpty.sql on the database you choose to use.  setup.sql will set up the database with sample data (which corresponds to the tests we have included) whereas setupEmpty.sql will set up the database with empty tables.
 
 
 ### Functionalities
@@ -164,7 +164,10 @@ REVIEW: This command allows a reviewer to submit a review about a specific manus
 
 ### Testing
 
-NOTE: The things in the parentheses are just what the program returned to us, but the password and IDs will likely vary depending on how many times you register a new user/your password choice.  We just included it as a reference.
+NOTE 1: These tests assume that our sql script with sample data has been run on the database prior to starting.
+
+
+NOTE 2: The things in the parentheses are just what the program returned to us, but the password and IDs will likely vary depending on how many times you register a new user/your password choice.  We just included it as a reference.
 
 
 Please run the following command to start the program:
