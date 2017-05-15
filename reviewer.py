@@ -27,7 +27,7 @@ class Reviewer:
             else:
                 raise ValueError()
 
-            password = auth.createPassword(con, salt)
+            password = auth.createPassword()
 
             if not password:
                 return
@@ -43,7 +43,7 @@ class Reviewer:
             for x in range(0, riCodes):
                 Reviewer.insertReviewerInterest(con, int(reviewerID), int(input[6 + x]))
 
-            auth.register(con, reviewerID, 'Reviewer', password)
+            auth.register(con, reviewerID, 'Reviewer', password, salt)
 
             print("Created a reviewer with ID=%s... you can now login" % reviewerID)
             cursor.close()
@@ -65,8 +65,16 @@ class Reviewer:
             query = "UPDATE Reviewer SET Retired=%d WHERE ReviewerId=%d;" % (1, self.id)
             cursor = self.con.cursor()
             cursor.execute(query)
-            self.con.commit()
             cursor.close()
+
+            userString = "TEAM11-%s" % ("R" + str(self.id).zfill(3))
+            query = "REVOKE ALL PRIVILEGES, GRANT OPTION FROM `%s`@'sunapee.cs.dartmouth.edu';" % userString
+            print(query)
+            # cursor = con.cursor(buffered=True)
+            # cursor.execute(query)
+            # cursor.close()
+
+            self.con.commit()
             print("Thank you for your service.")
             return
         except(ValueError, IndexError, NameError, TypeError):

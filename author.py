@@ -24,7 +24,7 @@ class PrimaryAuthor:
                 email = input[4]
                 address = input[5]
 
-                password = auth.createPassword(con, salt)
+                password = auth.createPassword()
 
                 if not password:
                     return
@@ -35,7 +35,7 @@ class PrimaryAuthor:
                 authorId = cursor.lastrowid
                 cursor.close()
 
-                auth.register(con, authorId, 'PrimaryAuthor', password)
+                auth.register(con, authorId, 'PrimaryAuthor', password, salt)
 
                 print("Created an author with ID=%s... you can now login" % authorId)
             else:
