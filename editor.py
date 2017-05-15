@@ -22,7 +22,7 @@ class Editor:
                 fname = input[2]
                 lname = input[3]
 
-                password = auth.createPassword(con, salt)
+                password = auth.createPassword()
 
                 if not password:
                     return
@@ -35,7 +35,7 @@ class Editor:
 
                 editorId = cursor.lastrowid
 
-                auth.register(con, editorId, 'Editor', password)
+                auth.register(con, editorId, 'Editor', password, salt)
 
                 print("Created an editor with ID=%s... you can now login" % editorId)
                 cursor.close()
